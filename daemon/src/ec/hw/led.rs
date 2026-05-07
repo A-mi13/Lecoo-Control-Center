@@ -7,12 +7,13 @@ use super::EcDevice;
 static IS_LED_ALREADY_CUSTOM: AtomicBool = AtomicBool::new(false);
 
 pub fn reset_led_anim_engine(ec: &EcDevice) -> Result<()> {
-    ec.write_reg(ec.offsets.reg_led_breath_en, 0x00)?;     // Disable hardware breathing dimmer
-    ec.write_reg(ec.offsets.reg_pwm_prescaler, 0x00)?;     // Reset prescaler (maximum PWM frequency)
-    ec.write_reg(ec.offsets.reg_pwm_cycle, 0xFF)?;         // Reset Cycle Time (standard 256 steps)
-    Ok(())
+    ec.with_batch(|b| {
+        b.write_reg(b.offsets.reg_led_breath_en, 0x00)?;     // Disable hardware breathing dimmer
+        b.write_reg(b.offsets.reg_pwm_prescaler, 0x00)?;     // Reset prescaler (maximum PWM frequency)
+        b.write_reg(b.offsets.reg_pwm_cycle, 0xFF)           // Reset Cycle Time (standard 256 steps)
+    })
 }
-
+// TODO: improve logic here... one day
 
 pub fn apply_led_mode(ec: &EcDevice, mode: &PowerLedMode) -> Result<()> {
     let offsets = ec.offsets;
