@@ -1,0 +1,98 @@
+_version: 1
+
+# 命令说明
+cmd_app_about: "联想来酷控制中心 CLI"
+cmd_info_about: "获取嵌入式控制器信息"
+cmd_temps_about: "获取系统温度"
+cmd_fans_about: "获取当前风扇转速（RPM）"
+cmd_monitoring_about: "实时监控温度和风扇"
+cmd_fan_about: "控制风扇设置（例如：`fan cpu auto`）"
+cmd_charge_about: "获取或设置电池充电限制"
+cmd_power_about: "设置系统电源配置"
+cmd_kbd_about: "设置键盘背光级别"
+cmd_led_about: "控制后置LED光环"
+cmd_daemon_about: "控制守护进程设置（高级）"
+cmd_led_auto_about: "LED自动EC控制"
+cmd_led_custom_about: "设置手动静态亮度"
+cmd_daemon_telemetry_about: "更改遥测设置"
+cmd_daemon_settings_about: "更改守护进程内部设置"
+cmd_daemon_version_about: "显示守护进程版本"
+cmd_telemetry_enable_about: "启用遥测"
+cmd_telemetry_disable_about: "禁用遥测"
+cmd_telemetry_id_about: "获取遥测ID"
+cmd_settings_reset_about: "将守护进程设置重置为默认值"
+cmd_settings_read_about: "显示当前守护进程设置"
+cmd_settings_apply_about: "应用保存的守护进程状态"
+
+# 参数帮助
+arg_monitoring_rate_help: "更新频率（秒）（默认：1.0）"
+arg_fan_target_help: "目标风扇（cpu/gpu/both）"
+arg_fan_mode_help: "风扇模式（auto/full/custom）"
+arg_fan_val_help: "自定义PWM值（0-255）"
+arg_charge_limit_help: "设置电池充电限制模式"
+arg_power_profile_help: "选择电源配置"
+arg_kbd_mode_help: "选择背光模式/级别"
+arg_kbd_val_help: "自定义亮度值（0-255）"
+arg_led_val_help: "LED亮度值（0-255）"
+
+# 电源配置值帮助
+arg_power_profile_silent_help: "静音模式（最低功耗）"
+arg_power_profile_default_help: "默认平衡模式"
+arg_power_profile_perf_help: "性能模式（最大功耗）"
+
+# 风扇目标值帮助
+arg_fan_target_cpu_help: "CPU风扇"
+arg_fan_target_gpu_help: "GPU风扇"
+arg_fan_target_both_help: "CPU和GPU风扇"
+
+# 风扇模式值帮助
+arg_fan_mode_auto_help: "自动EC控制"
+arg_fan_mode_full_help: "全速（100%）"
+arg_fan_mode_custom_help: "自定义PWM占空比"
+
+# 键盘背光值帮助
+arg_kbd_mode_off_help: "关闭背光"
+arg_kbd_mode_low_help: "低亮度"
+arg_kbd_mode_medium_help: "中等亮度"
+arg_kbd_mode_high_help: "高亮度"
+arg_kbd_mode_custom_help: "自定义亮度值"
+
+# 充电限制值帮助
+arg_charge_limit_full_help: "全容量（100%）"
+arg_charge_limit_high_help: "高容量（95%）"
+arg_charge_limit_balanced_help: "平衡模式（80%）"
+arg_charge_limit_lifespan_help: "最大电池寿命（60%）"
+arg_charge_limit_desk_help: "桌面模式（40%）"
+
+arg_charge_limit_long_help: |
+  设置电池充电限制模式（FlexiCharger）。
+
+  可用模式：
+    - full:     全容量（100%）
+    - high:     高容量（95%）
+    - balanced: 平衡模式（80%）
+    - lifespan: 最大电池寿命（60%）
+    - desk:     桌面模式（40%）
+
+# 消息和错误
+err_daemon_connection: "连接守护进程失败！它是否正在运行？"
+msg_monitoring_start: "监控已启用。更新频率：%{rate} ms"
+msg_monitoring_loop: "🌡️ CPU: %{cpu}°C, 系统: %{sys}°C | 💨 风扇: %{cpu_f} RPM (CPU), %{gpu_f} RPM (GPU)"
+msg_success: "完成。"
+msg_error: "❌ 错误：%{msg}"
+
+# 响应
+resp_sys_info: "控制器: %{chip} (版本 %{rev})\nHRAM偏移: 0x%{offset}\n守护进程版本: %{ver}"
+resp_fans_rpm: "⚙️ 风扇转速:\n   CPU: %{cpu} RPM\n   GPU: %{gpu} RPM"
+resp_temps: "🌡️ 温度:\n   CPU: %{cpu} °C\n   系统: %{sys} °C"
+resp_kbd_backlight: "💡 键盘背光:\n   级别: %{lvl}"
+resp_charge_title: "🔋 充电限制 (FlexiCharger):"
+resp_charge_full: "   模式: 全容量（充电至100%）"
+resp_charge_range: "   开始充电: %{min}%\n   停止充电:  %{max}%"
+resp_charge_current: "   当前电池电量: %{cur}%"
+resp_power_title: "⚡ 电源配置:"
+resp_power_current: "   当前: %{prof}"
+resp_telemetry_disabled: |
+  🔗 匿名遥测已禁用。遥测帮助我改进此项目的质量。
+  请考虑启用它，它是免费且匿名的 :)
+resp_telemetry_id: "🔗 遥测ID: 0x%{id}"
