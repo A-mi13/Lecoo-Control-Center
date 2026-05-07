@@ -83,6 +83,20 @@ fn my_service_main(_arguments: Vec<std::ffi::OsString>) {
 
                 ServiceControl::PowerEvent(power_event) => {
                     match power_event {
+                        PowerEventParam::PowerStatusChange => {
+                            let mut status = SystemPowerStatus::default();
+                            unsafe {
+                                if GetSystemPowerStatus(&mut status) != 0 {
+                                    let event = if status.ac_line_status == 1 {
+                                        InternalEvent::ChargerConnected
+                                    } else {
+                                        InternalEvent::ChargerDisconnected
+                                    };
+                                    let _ = tx.send(event);
+                                }
+                            }
+                        }
+
                         PowerEventParam::Suspend => {
                             // INFO: The Lecoo Pro 14's sleep state (s2idle) is not functional, it's broken, but Fast Boot is considered suspended for the service.
                             // Treat as shutdown since we can't actually enter a proper sleep state.
@@ -132,6 +146,21 @@ fn my_service_main(_arguments: Vec<std::ffi::OsString>) {
         wait_hint: Duration::default(),
         process_id: None,
     }).unwrap();
+}
+
+#[repr(C)]
+#[derive(Default, Debug, Clone, Copy)]
+struct SystemPowerStatus {
+    ac_line_status: u8,
+    battery_flag: u8,
+    battery_life_percent: u8,
+    system_status_flag: u8,
+    battery_life_time: u32,
+    battery_full_life_time: u32,
+}
+
+unsafe extern "system" {
+    fn GetSystemPowerStatus(lp_system_power_status: *mut SystemPowerStatus) -> i32;
 }
 
 pub fn init_logger() {
