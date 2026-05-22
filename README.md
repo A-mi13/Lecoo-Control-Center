@@ -8,11 +8,13 @@ A desktop control center for Lecoo / Emdoor laptops — fan curves, power profil
 </p>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows-0078D6.svg)]()
+[![Platform](https://img.shields.io/badge/platform-Windows-0078D6.svg)](https://github.com/A-mi13/Lecoo-Control-Center)
 [![Built with Tauri 2](https://img.shields.io/badge/built%20with-Tauri%202-24C8DB.svg)](https://tauri.app/)
-[![Language](https://img.shields.io/badge/language-Rust%20%2B%20React-orange.svg)]()
+[![Language](https://img.shields.io/badge/language-Rust%20%2B%20React-orange.svg)](https://github.com/A-mi13/Lecoo-Control-Center)
 
 </div>
+
+**Languages:** [English](README.md) · [中文](README_CN.md) · [Русский](README_RU.md)
 
 ## About this fork
 
@@ -22,7 +24,7 @@ This fork focuses on building a polished desktop GUI and tightening up a few rou
 
 - **Tauri 2 + React desktop GUI** — a Lenovo Vantage-style "center" surface for monitoring and configuration (the main reason this fork exists).
 - **Server-side fan curve engine** — fan curves are evaluated by the daemon based on live temperature, not by the client polling and writing PWM values from user space.
-- **Resume-from-sleep recovery** — after the system wakes from S3/S0ix, the daemon re-applies the last known profile, fan mode and battery limit instead of leaving the EC in whatever state Windows left it in.
+- **Resume-from-sleep recovery** — after the system resumes from sleep or modern standby (S3 / S0ix), the daemon re-applies the last known profile, fan mode and battery limit instead of leaving the EC in whatever state Windows left it in.
 - **Windows 11 25H2 auto-start fix** — the service now starts reliably on Windows 11 25H2, where the upstream daemon was failing to come up at boot.
 - **Lock contention guard** — concurrent CLI / GUI / scheduled-task access to the EC no longer wedges the daemon under contention; the I/O lock has a fair wait and a watchdog.
 
@@ -30,9 +32,11 @@ Everything else — EC HRAM probing, PWM control, FlexiCharger thresholds, LED r
 
 ## Screenshots
 
-> Screenshots will be added here once the GUI lands its first release. Until then, see the [upstream CLI screenshot](https://github.com/LaVashikk/Lecoo-Control-Center) for a feel of what the underlying daemon exposes.
+> Screenshots will be added here once the GUI lands its first release. Until then, see the [upstream CLI screenshot](branding/cli.jpg) for a feel of what the underlying daemon exposes.
 
-## Features (GUI)
+## Features (planned)
+
+These are the capabilities the GUI is being built toward. Status of each will be tracked in [CHANGELOG.md](CHANGELOG.md) and the project's release notes.
 
 - ✨ **Live telemetry** — CPU and system temperatures, CPU and GPU fan RPM, current power profile, battery state, refreshed in real time over the daemon's IPC channel.
 - 🌡️ **Fan curves** — interactive temperature → duty-cycle curve editor for the CPU and GPU fans, evaluated server-side by the daemon.
@@ -68,25 +72,15 @@ cd Lecoo-Control-Center
 
 # Build the daemon and CLI
 cargo build --release
-
-# Build the GUI (Tauri front-end + back-end)
-cd gui
-pnpm install
-pnpm tauri build
 ```
 
-The daemon and CLI binaries land in `target/release/`. The packaged GUI installer (MSI / NSIS) lands in `gui/src-tauri/target/release/bundle/`.
+The daemon and CLI binaries land in `target/release/`.
 
-For day-to-day development:
-
-```bash
-cd gui
-pnpm tauri dev    # hot-reload GUI + auto-rebuild Rust back-end
-```
+> **Note:** The Tauri 2 + React front-end is under active development on this branch and is not yet buildable from a clean checkout. For now only `cargo build --release` (daemon + CLI) is supported. Front-end build instructions will land in a follow-up commit.
 
 ## Architecture
 
-This is a Cargo workspace with the following crates:
+This is a Cargo workspace. The workspace members and supporting directories are:
 
 ```
 Lecoo-Control-Center/
@@ -94,8 +88,8 @@ Lecoo-Control-Center/
 ├── daemon/            # Background service: EC driver, fan curve engine, IPC server
 ├── cli/               # `lecoo-ctrl` command-line client
 ├── gui/               # Tauri 2 desktop app (Rust back-end + React front-end)
-├── libs/              # Internal helpers (EC HRAM probing, hardware quirks)
-└── telemetry_server/  # Optional anonymous telemetry receiver (self-hostable)
+├── telemetry_server/  # Optional anonymous telemetry receiver (self-hostable)
+└── libs/              # Vendored native dependencies (inpoutx64.dll)
 ```
 
 The GUI talks to the daemon over the same IPC channel the CLI uses, so the two clients can run side by side without conflict.
