@@ -42,12 +42,17 @@ The GUI is in **beta**. All seven feature phases (shell, telemetry, dashboard, p
     <td align="center"><img src="branding/screenshots/fans.png" alt="Fan curve editor" width="420"><br><sub>Fans · curve editor</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="branding/screenshots/led-animation.png" alt="LED Ring animation builder" width="420"><br><sub>LED Ring · animation builder</sub></td>
-    <td align="center"><img src="branding/screenshots/settings.png" alt="Settings · Diagnostics" width="420"><br><sub>Settings · diagnostics</sub></td>
+    <td align="center"><img src="branding/screenshots/power.png" alt="Power profiles" width="420"><br><sub>Power · profile + diagnostics</sub></td>
+    <td align="center"><img src="branding/screenshots/battery.png" alt="Battery limits" width="420"><br><sub>Battery · FlexiCharger</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="branding/screenshots/keyboard.png" alt="Keyboard backlight" width="420"><br><sub>Keyboard · backlight</sub></td>
+    <td align="center"><img src="branding/screenshots/led-ring.png" alt="LED Ring" width="420"><br><sub>LED Ring · animation builder</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="branding/screenshots/settings.png" alt="Settings" width="640"><br><sub>Settings · themes, language, diagnostics</sub></td>
   </tr>
 </table>
-
-*(GitHub will render a broken image placeholder until the four PNGs land in `branding/screenshots/` — see the README in that folder for what each file should show.)*
 
 ## Features
 

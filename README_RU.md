@@ -42,12 +42,17 @@ GUI находится в **бета**-стадии. Все семь фаз (she
     <td align="center"><img src="branding/screenshots/fans.png" alt="Fans" width="420"><br><sub>Fans · редактор кривой</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="branding/screenshots/led-animation.png" alt="LED Ring" width="420"><br><sub>LED Ring · конструктор анимаций</sub></td>
-    <td align="center"><img src="branding/screenshots/settings.png" alt="Settings" width="420"><br><sub>Settings · диагностика</sub></td>
+    <td align="center"><img src="branding/screenshots/power.png" alt="Power" width="420"><br><sub>Power · профиль + диагностика</sub></td>
+    <td align="center"><img src="branding/screenshots/battery.png" alt="Battery" width="420"><br><sub>Battery · FlexiCharger</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="branding/screenshots/keyboard.png" alt="Keyboard" width="420"><br><sub>Keyboard · подсветка</sub></td>
+    <td align="center"><img src="branding/screenshots/led-ring.png" alt="LED Ring" width="420"><br><sub>LED Ring · конструктор анимаций</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="branding/screenshots/settings.png" alt="Settings" width="640"><br><sub>Settings · темы, язык, диагностика</sub></td>
   </tr>
 </table>
-
-*(Пока в `branding/screenshots/` нет четырёх PNG, GitHub покажет иконки "broken image" — см. README в той папке, что должно быть на каждом скриншоте.)*
 
 ## Возможности
 

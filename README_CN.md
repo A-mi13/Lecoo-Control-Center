@@ -42,12 +42,17 @@ GUI 处于 **Beta** 阶段。全部七个功能阶段(shell、遥测、仪表盘
     <td align="center"><img src="branding/screenshots/fans.png" alt="Fans" width="420"><br><sub>Fans · 曲线编辑器</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="branding/screenshots/led-animation.png" alt="LED Ring" width="420"><br><sub>LED Ring · 动画构建器</sub></td>
-    <td align="center"><img src="branding/screenshots/settings.png" alt="Settings" width="420"><br><sub>Settings · 诊断</sub></td>
+    <td align="center"><img src="branding/screenshots/power.png" alt="Power" width="420"><br><sub>Power · 配置 + 诊断</sub></td>
+    <td align="center"><img src="branding/screenshots/battery.png" alt="Battery" width="420"><br><sub>Battery · FlexiCharger</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="branding/screenshots/keyboard.png" alt="Keyboard" width="420"><br><sub>Keyboard · 背光</sub></td>
+    <td align="center"><img src="branding/screenshots/led-ring.png" alt="LED Ring" width="420"><br><sub>LED Ring · 动画构建器</sub></td>
+  </tr>
+  <tr>
+    <td colspan="2" align="center"><img src="branding/screenshots/settings.png" alt="Settings" width="640"><br><sub>Settings · 主题、语言、诊断</sub></td>
   </tr>
 </table>
-
-*(在 `branding/screenshots/` 放入四张 PNG 之前,GitHub 会显示损坏图片占位符 —— 详见该文件夹的 README。)*
 
 ## 功能
 
