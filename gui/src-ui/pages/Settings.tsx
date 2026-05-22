@@ -263,11 +263,7 @@ export default function Settings() {
         <DaemonRow label={t('settings.daemon.status')} value={daemonStatusLabel(status, t)} />
         <DaemonRow
           label={t('settings.daemon.version')}
-          value={
-            status.kind === 'connected'
-              ? `${status.daemonVersion[0]}.${status.daemonVersion[1]}`
-              : '—'
-          }
+          value={formatDaemonVersion(status)}
         />
         <DaemonRow label={t('settings.daemon.gui_version')} value={GUI_VERSION} />
         <DaemonRow
@@ -365,6 +361,13 @@ function DaemonRow({ label, value }: { label: string; value: string }) {
       <span className="text-xs font-mono text-text-strong">{value}</span>
     </div>
   );
+}
+
+function formatDaemonVersion(status: ConnectionStatus): string {
+  if (status.kind !== 'connected') return '—';
+  const v = status.daemonVersion;
+  if (!Array.isArray(v) || v.length < 2) return '—';
+  return `${v[0]}.${v[1]}`;
 }
 
 function daemonStatusLabel(status: ConnectionStatus, t: (k: string) => string): string {

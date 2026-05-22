@@ -71,9 +71,11 @@ export function TempChart({ samples, rangeSeconds, height = 200 }: Props) {
     [width, height],
   );
 
+  const ready = width > 0 && (data[0]?.length ?? 0) > 0;
+
   return (
-    <div ref={containerRef} className="w-full">
-      {width > 0 ? <UPlotReact options={options} data={data} /> : null}
+    <div ref={containerRef} className="w-full" style={{ minHeight: height }}>
+      {ready ? <UPlotReact options={options} data={data} /> : null}
     </div>
   );
 }
