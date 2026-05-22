@@ -6,6 +6,7 @@
 /gui/src-tauri/target
 /gui/.tauri
 /gui/src-ui/.vite
+/gui/gen/
 
 # Local env
 .env
