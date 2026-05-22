@@ -144,6 +144,57 @@
       "high": "高"
     }
   },
+  "daemon_overlay": {
+    "disconnected_title": "无法连接守护进程",
+    "connecting_title": "正在连接守护进程…",
+    "error_title": "守护进程错误",
+    "body": "Lecoo 控制中心通过需要管理员权限的 Windows 服务与 EC 通信。如果服务未安装或已停止,GUI 仅可读。",
+    "retry": "立即重试"
+  },
+  "settings": {
+    "appearance": "外观",
+    "behavior": "行为",
+    "telemetry_group": "遥测",
+    "updates_group": "更新",
+    "daemon_group": "守护进程",
+    "diagnostics_group": "诊断",
+    "about_group": "关于",
+    "field": {
+      "language": "语言",
+      "theme": "主题",
+      "temp_unit": "温度",
+      "launch_at_startup": "开机启动",
+      "start_minimized": "最小化启动",
+      "close_to_tray": "关闭至托盘",
+      "show_tray_icon": "显示托盘图标",
+      "poll_interval": "轮询间隔",
+      "history_window": "历史窗口",
+      "auto_check_updates": "自动检查更新",
+      "verbose_logging": "详细日志"
+    },
+    "temp": { "celsius": "°C", "fahrenheit": "°F" },
+    "poll": { "1": "1秒", "2": "2秒", "5": "5秒" },
+    "history": { "5": "5分", "30": "30分", "120": "2小时" },
+    "daemon": {
+      "status": "状态",
+      "version": "版本",
+      "gui_version": "GUI 版本",
+      "pipe": "IPC 端点",
+      "endpoint_value": "lecoo_ctl_daemon"
+    },
+    "diagnostics": {
+      "open_logs": "打开日志文件夹",
+      "copy_bundle": "复制诊断信息",
+      "copied": "已复制 — 粘贴到 issue",
+      "copy_failed": "无法复制到剪贴板",
+      "verbose_hint": "记录 debug 级别的日志。提交 issue 时建议开启。"
+    },
+    "about": {
+      "tagline": "Lenovo Legion / Lecoo 开源控制中心。",
+      "license": "MIT",
+      "github": "在 GitHub 上查看"
+    }
+  },
   "connection": {
     "disconnected": "未连接",
     "connecting": "连接中…",

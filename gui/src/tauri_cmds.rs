@@ -9,7 +9,11 @@ use tauri::State;
 
 use crate::curve::FanCurve;
 use crate::curve_runner::{CurveRunner, FanCurveState};
+use tauri_plugin_autostart::ManagerExt;
+
+use crate::diagnostics;
 use crate::ipc_client::IpcClient;
+use crate::logging::LogControl;
 use crate::state::{AppState, ConnectionStatus, Telemetry};
 
 #[tauri::command]
@@ -27,6 +31,14 @@ pub fn get_connection_status(state: State<'_, Arc<AppState>>) -> ConnectionStatu
 // Each setter opens a fresh IpcClient connection, sends one request, and expects
 // IpcResponse::Success. Errors come back as plain strings (Tauri turns Err into a
 // rejected promise on the JS side).
+
+pub fn apply_power_profile(profile: PowerProfile) -> Result<(), String> {
+    send_one(IpcRequest::SetPowerProfile(profile))
+}
+
+pub fn apply_fan_mode(fan: FanIndex, mode: FanMode) -> Result<(), String> {
+    send_one(IpcRequest::SetFanMode { fan, mode })
+}
 
 fn send_one(req: IpcRequest) -> Result<(), String> {
     let mut client = IpcClient::connect().map_err(|e| e.to_string())?;
@@ -296,6 +308,75 @@ pub fn set_fan_curve(
     let mut st = slot.write();
     st.curve = Some(curve);
     Ok(())
+}
+
+#[tauri::command]
+pub fn reconnect_now(state: State<'_, Arc<AppState>>) {
+    state.reconnect_signal.notify_one();
+}
+
+// ---------- Autostart ----------
+
+#[tauri::command]
+pub async fn set_autostart(app: tauri::AppHandle, enable: bool) -> Result<(), String> {
+    let manager = app.autolaunch();
+    if enable {
+        manager.enable().map_err(|e| e.to_string())
+    } else {
+        manager.disable().map_err(|e| e.to_string())
+    }
+}
+
+#[tauri::command]
+pub async fn get_autostart(app: tauri::AppHandle) -> Result<bool, String> {
+    let manager = app.autolaunch();
+    manager.is_enabled().map_err(|e| e.to_string())
+}
+
+// ---------- Diagnostics ----------
+
+#[tauri::command]
+pub fn open_logs_dir(log_ctl: State<'_, Arc<LogControl>>) -> Result<(), String> {
+    let path = log_ctl.log_dir().to_path_buf();
+    std::fs::create_dir_all(&path).map_err(|e| e.to_string())?;
+    open_in_explorer(&path).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn get_diagnostics_bundle(
+    state: State<'_, Arc<AppState>>,
+    log_ctl: State<'_, Arc<LogControl>>,
+) -> String {
+    diagnostics::collect(state.inner(), log_ctl.inner())
+}
+
+#[tauri::command]
+pub fn set_log_level(level: String, log_ctl: State<'_, Arc<LogControl>>) -> Result<(), String> {
+    log_ctl.set_level(&level)
+}
+
+#[cfg(target_os = "windows")]
+fn open_in_explorer(path: &std::path::Path) -> std::io::Result<()> {
+    std::process::Command::new("explorer")
+        .arg(path)
+        .spawn()
+        .map(|_| ())
+}
+
+#[cfg(target_os = "macos")]
+fn open_in_explorer(path: &std::path::Path) -> std::io::Result<()> {
+    std::process::Command::new("open")
+        .arg(path)
+        .spawn()
+        .map(|_| ())
+}
+
+#[cfg(all(unix, not(target_os = "macos")))]
+fn open_in_explorer(path: &std::path::Path) -> std::io::Result<()> {
+    std::process::Command::new("xdg-open")
+        .arg(path)
+        .spawn()
+        .map(|_| ())
 }
 
 #[tauri::command]

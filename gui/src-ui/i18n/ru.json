@@ -144,6 +144,57 @@
       "high": "Высокая"
     }
   },
+  "daemon_overlay": {
+    "disconnected_title": "Daemon не отвечает",
+    "connecting_title": "Подключаемся к daemon'у…",
+    "error_title": "Ошибка daemon'а",
+    "body": "Lecoo Control Center работает через Windows-сервис, которому нужны права администратора для EC. Если сервис не установлен или остановлен, GUI работает только на чтение.",
+    "retry": "Повторить"
+  },
+  "settings": {
+    "appearance": "Внешний вид",
+    "behavior": "Поведение",
+    "telemetry_group": "Телеметрия",
+    "updates_group": "Обновления",
+    "daemon_group": "Daemon",
+    "diagnostics_group": "Диагностика",
+    "about_group": "О программе",
+    "field": {
+      "language": "Язык",
+      "theme": "Тема",
+      "temp_unit": "Температура",
+      "launch_at_startup": "Автозапуск",
+      "start_minimized": "Старт свёрнутым",
+      "close_to_tray": "Закрытие в трей",
+      "show_tray_icon": "Показывать иконку в трее",
+      "poll_interval": "Интервал опроса",
+      "history_window": "Окно истории",
+      "auto_check_updates": "Авто-проверка обновлений",
+      "verbose_logging": "Подробные логи"
+    },
+    "temp": { "celsius": "°C", "fahrenheit": "°F" },
+    "poll": { "1": "1с", "2": "2с", "5": "5с" },
+    "history": { "5": "5 мин", "30": "30 мин", "120": "2 ч" },
+    "daemon": {
+      "status": "Статус",
+      "version": "Версия",
+      "gui_version": "Версия GUI",
+      "pipe": "IPC endpoint",
+      "endpoint_value": "lecoo_ctl_daemon"
+    },
+    "diagnostics": {
+      "open_logs": "Открыть папку логов",
+      "copy_bundle": "Скопировать диагностику",
+      "copied": "Скопировано — вставь в issue",
+      "copy_failed": "Не удалось скопировать в буфер",
+      "verbose_hint": "Пишет debug-логи. Включи, если собираешь данные для issue."
+    },
+    "about": {
+      "tagline": "Открытая панель управления для Lenovo Legion / Lecoo.",
+      "license": "MIT",
+      "github": "Открыть на GitHub"
+    }
+  },
   "connection": {
     "disconnected": "Нет связи",
     "connecting": "Соединение…",

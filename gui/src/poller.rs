@@ -28,13 +28,16 @@ async fn run(app: AppHandle) {
                 c
             }
             Err(e) => {
-                tracing::warn!("daemon connect failed: {e}");
-                set_status(
-                    &app,
-                    &state,
-                    ConnectionStatus::Error { message: e.to_string() },
-                );
-                tokio::time::sleep(Duration::from_millis(RECONNECT_DELAY_MS)).await;
+                let msg = e.to_string();
+                tracing::warn!("daemon connect failed: {msg}");
+                *state.last_connection_error.write() = Some(msg.clone());
+                set_status(&app, &state, ConnectionStatus::Error { message: msg });
+                tokio::select! {
+                    _ = tokio::time::sleep(Duration::from_millis(RECONNECT_DELAY_MS)) => {}
+                    _ = state.reconnect_signal.notified() => {
+                        tracing::info!("reconnect_now: poller woken up");
+                    }
+                }
                 continue;
             }
         };
@@ -46,7 +49,9 @@ async fn run(app: AppHandle) {
                     let _ = app.emit("telemetry", &t);
                 }
                 Err(e) => {
-                    tracing::warn!("poll failed, will reconnect: {e}");
+                    let msg = e.to_string();
+                    tracing::warn!("poll failed, will reconnect: {msg}");
+                    *state.last_connection_error.write() = Some(msg);
                     break;
                 }
             }

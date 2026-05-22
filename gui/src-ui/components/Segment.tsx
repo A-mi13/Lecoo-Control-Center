@@ -1,9 +1,11 @@
-interface Option<T extends string> {
+type SegmentValue = string | number;
+
+interface Option<T extends SegmentValue> {
   label: string;
   value: T;
 }
 
-interface Props<T extends string> {
+interface Props<T extends SegmentValue> {
   options: Option<T>[];
   value: T;
   onChange: (v: T) => void;
@@ -11,7 +13,7 @@ interface Props<T extends string> {
   size?: 'sm' | 'md';
 }
 
-export function Segment<T extends string>({
+export function Segment<T extends SegmentValue>({
   options,
   value,
   onChange,

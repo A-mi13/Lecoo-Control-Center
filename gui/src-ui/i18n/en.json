@@ -144,6 +144,57 @@
       "high": "High"
     }
   },
+  "daemon_overlay": {
+    "disconnected_title": "Daemon not reachable",
+    "connecting_title": "Connecting to daemon…",
+    "error_title": "Daemon error",
+    "body": "Lecoo Control Center talks to a Windows service that needs admin rights to drive the EC. If the service is missing or stopped, the GUI is read-only.",
+    "retry": "Retry now"
+  },
+  "settings": {
+    "appearance": "Appearance",
+    "behavior": "Behavior",
+    "telemetry_group": "Telemetry",
+    "updates_group": "Updates",
+    "daemon_group": "Daemon",
+    "diagnostics_group": "Diagnostics",
+    "about_group": "About",
+    "field": {
+      "language": "Language",
+      "theme": "Theme",
+      "temp_unit": "Temperature",
+      "launch_at_startup": "Launch at startup",
+      "start_minimized": "Start minimized",
+      "close_to_tray": "Close to tray",
+      "show_tray_icon": "Show tray icon",
+      "poll_interval": "Poll interval",
+      "history_window": "History window",
+      "auto_check_updates": "Auto-check updates",
+      "verbose_logging": "Verbose logging"
+    },
+    "temp": { "celsius": "°C", "fahrenheit": "°F" },
+    "poll": { "1": "1s", "2": "2s", "5": "5s" },
+    "history": { "5": "5m", "30": "30m", "120": "2h" },
+    "daemon": {
+      "status": "Status",
+      "version": "Version",
+      "gui_version": "GUI version",
+      "pipe": "IPC endpoint",
+      "endpoint_value": "lecoo_ctl_daemon"
+    },
+    "diagnostics": {
+      "open_logs": "Open log folder",
+      "copy_bundle": "Copy diagnostics",
+      "copied": "Copied · paste into your issue",
+      "copy_failed": "Could not copy to clipboard",
+      "verbose_hint": "Records debug-level traces. Helpful when filing an issue."
+    },
+    "about": {
+      "tagline": "Open-source control surface for Lenovo Legion / Lecoo machines.",
+      "license": "MIT",
+      "github": "View on GitHub"
+    }
+  },
   "connection": {
     "disconnected": "Disconnected",
     "connecting": "Connecting…",

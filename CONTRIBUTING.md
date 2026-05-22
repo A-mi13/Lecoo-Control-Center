@@ -32,3 +32,5 @@ Scope is optional (e.g., `feat(gui): ...`, `fix(daemon): ...`).
 ## Reporting issues
 
 For bugs in the **daemon, CLI, or EC layer**, prefer filing upstream at https://github.com/LaVashikk/Lecoo-Control-Center/issues. For **GUI-only issues**, file here.
+
+Whatever the layer, please attach a diagnostics bundle: open the GUI, go to **Settings → Diagnostics → Copy diagnostics**, and paste the result into the issue. If the bug needs more detail, enable **Verbose logging** first, reproduce it, then copy diagnostics again — the bundle then contains `debug`-level traces.

@@ -78,6 +78,15 @@ The daemon and CLI binaries land in `target/release/`.
 
 > **Note:** The Tauri 2 + React front-end is under active development on this branch and is not yet buildable from a clean checkout. For now only `cargo build --release` (daemon + CLI) is supported. Front-end build instructions will land in a follow-up commit.
 
+## Reporting bugs
+
+If something misbehaves, the easiest way to file a useful issue is from inside the GUI:
+
+1. Open **Settings → Diagnostics → Copy diagnostics**. This puts a markdown block on the clipboard with the GUI version, OS, last daemon error, and the tail of the current log.
+2. Paste that into a new issue at <https://github.com/A-mi13/Lecoo-Control-Center/issues>.
+
+If the bug is subtle (something works "most of the time"), toggle **Verbose logging** on, reproduce the problem, then copy diagnostics again — the bundle will include `debug`-level traces. The "Open log folder" button next to it opens `%LOCALAPPDATA%\Lecoo Control Center\logs\`, where daily-rotated log files live.
+
 ## Architecture
 
 This is a Cargo workspace. The workspace members and supporting directories are:
