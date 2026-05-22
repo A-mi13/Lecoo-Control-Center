@@ -1,181 +1,115 @@
 <div align="center">
-<img src="branding\logo-2.png" alt="Logo" >
+<img src="branding/logo-2.png" alt="Lecoo Control Center logo">
 
-<h3 align="center">
-Lecoo Control Center is a reverse-engineered, low-level Embedded Controller (EC) daemon and command-line interface designed for laptops based on the Emdoor chassis (such as the Lecoo Pro 14 / Lecoo N155). It provides direct hardware-level control over cooling, power limits, and lighting, replacing the need for non-existent official software.
-</h3>
-</div>
-<div align="center">
+<h1>Lecoo Control Center</h1>
 
-[![GitHub Release](https://img.shields.io/github/v/release/LaVashikk/Lecoo-Control-Center?color=orange)](https://github.com/LaVashikk/Lecoo-Control-Center/releases/latest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/LaVashikk/Lecoo-Control-Center/blob/main/LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey.svg)]()
-[![Language](https://img.shields.io/badge/language-Rust-orange.svg)]()
+<p>
+A desktop control center for Lecoo / Emdoor laptops — fan curves, power profiles, battery limits, keyboard backlight and rear LED ring control, built on top of LaVashikk's reverse-engineered Embedded Controller daemon.
+</p>
 
-🇷🇺 [Russian Readme here](README_RU.md)
-CN [中文 Readme 在这](README_CN.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows-0078D6.svg)]()
+[![Built with Tauri 2](https://img.shields.io/badge/built%20with-Tauri%202-24C8DB.svg)](https://tauri.app/)
+[![Language](https://img.shields.io/badge/language-Rust%20%2B%20React-orange.svg)]()
 
 </div>
 
-## ⚠️ Important Disclaimer
+## About this fork
 
-This software interacts directly with your system's hardware, specifically the Embedded Controller's (ITE IT5570/IT8987) HRAM window and low-level I/O ports. Incorrect configuration (such as setting custom fan curves to 0 RPM under heavy load) can result in overheating and irreversible hardware damage.
+This repository is a fork of [**LaVashikk/Lecoo-Control-Center**](https://github.com/LaVashikk/Lecoo-Control-Center) — the original project that reverse-engineered the ITE IT5570 / IT8987 Embedded Controllers used in the Lecoo Pro 14 (N155) family of laptops and built a Rust daemon plus a `lecoo-ctrl` CLI on top of them. All credit for the underlying EC research, the IPC protocol, the daemon, and the CLI belongs to LaVashikk.
 
-By using this software, you acknowledge these risks. The author is not responsible for any damage caused to your device. Use it at your own risk.
+This fork focuses on building a polished desktop GUI and tightening up a few rough edges in the daemon:
 
-## Features
+- **Tauri 2 + React desktop GUI** — a Lenovo Vantage-style "center" surface for monitoring and configuration (the main reason this fork exists).
+- **Server-side fan curve engine** — fan curves are evaluated by the daemon based on live temperature, not by the client polling and writing PWM values from user space.
+- **Resume-from-sleep recovery** — after the system wakes from S3/S0ix, the daemon re-applies the last known profile, fan mode and battery limit instead of leaving the EC in whatever state Windows left it in.
+- **Windows 11 25H2 auto-start fix** — the service now starts reliably on Windows 11 25H2, where the upstream daemon was failing to come up at boot.
+- **Lock contention guard** — concurrent CLI / GUI / scheduled-task access to the EC no longer wedges the daemon under contention; the I/O lock has a fair wait and a watchdog.
 
-  * **System Monitoring:** Read CPU/System temperatures and fan speeds (RPM).
-  * **Power Management:** Toggle between predefined EC power profiles (Silent, Default, Performance).
-  * **Thermal Control:** Manage CPU and GPU fans independently (Auto, Full speed, or Custom PWM duty cycles).
-  * **Battery Health (FlexiCharger):** Set custom battery charge limits to prolong battery lifespan (Full, High, Balanced, Lifespan, Desk mode).
-  * **Lighting Control:** Adjust keyboard backlight brightness.
-  * **Rear LED Ring Control:** Configure the rear power LED with static brightness or hardware-driven breathing animations.
+Everything else — EC HRAM probing, PWM control, FlexiCharger thresholds, LED ring animations, telemetry plumbing — comes straight from upstream.
 
-## Supported Hardware
+## Screenshots
 
-This software is primarily developed and tested on the Lecoo Pro 14 (Lecoo N155). Support for different revisions is tracked below:
+> Screenshots will be added here once the GUI lands its first release. Until then, see the [upstream CLI screenshot](https://github.com/LaVashikk/Lecoo-Control-Center) for a feel of what the underlying daemon exposes.
 
-| Model | Motherboard Revision | EC Chip | Status |
-| :--- | :--- | :--- | :--- |
-| Lecoo Pro 14 Amd (H255) | N155A | IT5571-07 | Confirmed Working |
-| Lecoo Pro 14 Intel (Core Ultra 5) | N155D | IT5570-02 | Working, except the Power-LED control |
-| Lecoo Pro 14 Intel (i5-13420H) | N155C | IT5570? | Probably Working |
+## Features (GUI)
 
-**Note:** This software might theoretically work on other Emdoor-based laptops utilizing the ITE IT5570 or IT8987 Embedded Controllers, as the daemon includes basic HRAM offset auto-detection.
+- ✨ **Live telemetry** — CPU and system temperatures, CPU and GPU fan RPM, current power profile, battery state, refreshed in real time over the daemon's IPC channel.
+- 🌡️ **Fan curves** — interactive temperature → duty-cycle curve editor for the CPU and GPU fans, evaluated server-side by the daemon.
+- ⚡ **Power profiles** — one-click Silent / Default / Performance switching, with the active profile reflected in the tray icon.
+- 🔋 **Battery health (FlexiCharger)** — set charge thresholds (Full, High, Balanced, Lifespan, Desk) from a single screen.
+- ⌨️ **Keyboard backlight** — adjust brightness levels (0–3).
+- 💡 **Rear LED ring** — pick between automatic charge-indicator behavior and a custom static / breathing mode.
+- 🎨 **Themes** — light, dark and system-follow themes.
+- 🌍 **Internationalization** — English and Russian translations out of the box, with room for more.
+- 📌 **System tray** — minimize-to-tray, quick profile switcher, live temperature/RPM readout in the tooltip.
 
-If you successfully run this on an unlisted hardware revision or a different Emdoor chassis, please open an issue or contact me to update the compatibility list!
+For the lower-level CLI (`lecoo-ctrl ...`) commands — temperature reads, manual PWM, telemetry opt-out — see the [upstream README](https://github.com/LaVashikk/Lecoo-Control-Center/blob/main/README.md). The CLI is preserved unchanged in this fork.
 
 ## Installation
 
-### ⚠️ Recommended: Use Pre-built Binaries
+A signed installer will be published once the GUI hits a tagged release. Until then, build from source (next section).
 
-**Do NOT build from source unless you are a developer!** Download the latest pre-built release instead:
+If you only want the daemon and the CLI without the GUI, the upstream pre-built binaries from [LaVashikk/Lecoo-Control-Center/releases](https://github.com/LaVashikk/Lecoo-Control-Center/releases/latest) will work — the IPC protocol is compatible.
 
-👉 **[Download Latest Release](https://github.com/LaVashikk/Lecoo-Control-Center/releases/latest)**
+## Building from source
 
-#### Windows Installation
+You will need:
 
-1. Download the `lecoo-*-windows.zip` archive from the releases page.
-2. Extract the archive to any folder.
-3. Right-click on `install.bat` and select **"Run as Administrator"**.
-4. Open a new terminal window and run `lecoo-ctrl help` to verify installation.
+- **Rust** stable toolchain (1.80+) — install via [rustup](https://rustup.rs/).
+- **Node.js** 20+ and **pnpm** 9+ for the GUI front-end.
+- **Tauri 2** prerequisites for your platform — see the [Tauri prerequisites guide](https://v2.tauri.app/start/prerequisites/). On Windows this is just the MSVC build tools and WebView2 (already bundled with Windows 11).
 
-#### Linux Installation
-
-1. Download the `lecoo-*-linux.tar.gz` archive from the releases page.
-2. Extract the archive: `tar -xzf lecoo-*-linux.tar.gz`
-3. Navigate to the extracted folder and run: `sudo ./install.sh`
-4. Use the `lecoo-ctrl` command to interact with the daemon.
-
-## Known Issues
-
-* **Windows 11 Daemon Auto-start:** The background daemon currently fails to start automatically on Windows 11. The root cause is still under investigation.
-* **FlexiCharger Reset on Power Loss:** If the laptop is powered off and unplugged from the wall for more than 5 minutes, the Embedded Controller (EC) clears its memory and resets the charge limits. If you plug the laptop in *before* booting up, the battery will charge to 100%. However, once the system boots and the daemon initializes, the battery will naturally discharge back down to your configured limit and resume normal behavior.
-* **Charge Indicator in Custom LED Mode:** When the rear LED ring is set to `custom` mode, the standard battery charge indicator stops functioning.
-* **LED Ring Stays On After Hard Shutdown:** If you perform a hard power-off (holding the power button) while the rear LED ring is in `custom` mode, the ring will remain lit. **Workaround:** Turn the laptop on and shut it down normally.
-* **Conflicts with Official Software:** Using the `power` command to adjust TDP profiles may conflict with the manufacturer's official software (`PowerModeUtility`). It is highly recommended to use only one of these tools at a time.
-* **Anti-cheat Software (Windows):** Some anti-cheat systems (such as FaceIT) may terminate the daemon process. This occurs because the daemon utilizes the official manufacturer driver to access the Embedded Controller.
-* **Secure Boot & Kernel Lockdown (Linux):** On distributions with Secure Boot enabled (e.g., Fedora), the daemon currently cannot access low-level I/O ports (`/dev/port`), resulting in a "Lockdown" error. This limitation will be addressed in future updates.
-
-## Usage (CLI)
-
-The daemon runs in the background. You interact with it using the `lecoo-ctrl` command-line tool.
-
-<img src="branding\cli.jpg" alt="lecoo-ctrl" width=50% >
-
-Here are the primary commands for `lecoo-ctrl`:
-
-### System Information & Monitoring
-
-  * `lecoo-ctrl help` - Display available commands and their usage.
-  * `lecoo-ctrl info` - Retrieve basic EC information and daemon version.
-  * `lecoo-ctrl temps` - Display current CPU and System temperatures.
-  * `lecoo-ctrl fans` - Display current CPU and GPU fan speeds in RPM.
-
-### Power & Battery Settings
-
-  * `lecoo-ctrl power <silent|default|perf>` - Apply a specific power/TDP profile.
-      * *Example:* `lecoo-ctrl power perf`
-  * `lecoo-ctrl charge <full|high|balanced|lifespan|desk>` - Set battery charging thresholds (FlexiCharger).
-      * *Example:* `lecoo-ctrl charge desk` (Limits charging to 40-50% for permanent AC usage).
-      * Run `lecoo-ctrl charge` without arguments to view the current limit and battery capacity.
-
-### Thermal Control
-
-  * `lecoo-ctrl fan <cpu|gpu> <auto|full|custom> [value]` - Control fan behavior.
-      * *Example (Automatic):* `lecoo-ctrl fan cpu auto`
-      * *Example (Maximum Speed):* `lecoo-ctrl fan gpu full`
-      * *Example (Custom PWM):* `lecoo-ctrl fan cpu custom 150` (Sets custom duty cycle).
-
-### Lighting Control
-
-  * `lecoo-ctrl kbd <0|1|2|3>` - Set keyboard backlight level (0 is off, 3 is maximum).
-  * `lecoo-ctrl led <auto|custom>` - Control the rear LED ring.
-      * *Example:* `lecoo-ctrl led custom 50`
-
-## GUI
-
-A Graphical User Interface (GUI) is currently in development and will be available in a future release.
-
-## Telemetry & Data Collection
-
-To help improve the software - specifically to refine the HRAM auto-detection logic across different motherboard revisions and catch unexpected daemon crashes - this project includes an **optional, fully anonymous telemetry system**.
-
-**What is collected:**
-
-  * Microcontroller data ONLY (EC chip version, HRAM memory offset).
-  * CPU Name.1
-  * Basic operational state (temperatures, fan RPM, active power profile).
-  * Crash logs (Panic traces) if the daemon fails.
-
-**What is NOT collected:**
-
-  * Absolutely NO Operating System data, usernames, IP addresses, MAC addresses, or personal information.
-
-Telemetry is enabled by default to support the project's growth. If you prefer to opt out, you can disable it at any time with the following command:
+Clone and build:
 
 ```bash
-lecoo-ctrl daemon telemetry disable
-```
-
-## Building from Source (For Developers)
-
-Ensure you have the Rust toolchain installed.
-
-Clone the repository:
-
-```bash
-git clone https://github.com/LaVashikk/Lecoo-Control-Center.git
+git clone https://github.com/A-mi13/Lecoo-Control-Center.git
 cd Lecoo-Control-Center
+
+# Build the daemon and CLI
+cargo build --release
+
+# Build the GUI (Tauri front-end + back-end)
+cd gui
+pnpm install
+pnpm tauri build
 ```
 
-You can build the project using standard Cargo commands, or use the predefined aliases located in `.cargo/config.toml`:
+The daemon and CLI binaries land in `target/release/`. The packaged GUI installer (MSI / NSIS) lands in `gui/src-tauri/target/release/bundle/`.
 
-**Windows:**
+For day-to-day development:
 
 ```bash
-cargo build-win       # Builds the daemon
-cargo build-ctrl-win  # Builds the CLI client
+cd gui
+pnpm tauri dev    # hot-reload GUI + auto-rebuild Rust back-end
 ```
 
-**Linux:**
+## Architecture
 
-```bash
-cargo build-linux       # Builds the daemon
-cargo build-ctrl-linux  # Builds the CLI client
+This is a Cargo workspace with the following crates:
+
+```
+Lecoo-Control-Center/
+├── ipc/               # Shared types and Unix-socket / named-pipe IPC protocol
+├── daemon/            # Background service: EC driver, fan curve engine, IPC server
+├── cli/               # `lecoo-ctrl` command-line client
+├── gui/               # Tauri 2 desktop app (Rust back-end + React front-end)
+├── libs/              # Internal helpers (EC HRAM probing, hardware quirks)
+└── telemetry_server/  # Optional anonymous telemetry receiver (self-hostable)
 ```
 
-## License & Support
+The GUI talks to the daemon over the same IPC channel the CLI uses, so the two clients can run side by side without conflict.
 
-This project is open-source and licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+## License
 
-If you find this tool useful and want to support its continued development, consider buying me a coffee (or a beer, who knows, lol)!
+Released under the [MIT License](LICENSE), matching the upstream project.
 
-* **International:** [Donate via Lava.top](https://app.lava.top/lavashik?tabId=donate)
-* **Russia:** [Donate via CloudTips](https://pay.cloudtips.ru/p/7e960f26)
-* **China:** [Alipay](branding/alipay.jpg)
-* **Cryptocurrency:**
-  * **SOL (Solana):** `CvbAT3VduADYyGRBZDq5CD3kLYcYYjYjFzgWFftsbgAB`
-  * **ETH (ERC-20):** `0x44B03F26B4dc7b8AcBBCFc456e4181872386a8D8`
-  * **BTC (Native Segwit):** `bc1q3sej9r9v9syamjanq7mg6a7002pc4m6d6qnv6k`
+## Credits
+
+- **[LaVashikk](https://github.com/LaVashikk)** — original author of the Lecoo Control Center project. Reverse-engineered the ITE IT5570 / IT8987 Embedded Controller HRAM layout, designed the IPC protocol, wrote the Rust daemon and the `lecoo-ctrl` CLI, and built the telemetry pipeline. This fork would not exist without that work.
+- **[A-mi13](https://github.com/A-mi13)** — maintainer of this fork; responsible for the Tauri 2 + React GUI and the daemon fixes listed in [About this fork](#about-this-fork).
+- Thanks to the broader Lecoo / Emdoor laptop community that contributed motherboard revisions and EC offset reports to the upstream repository.
+
+## Disclaimer
+
+This software drives the laptop's Embedded Controller directly. Misconfiguration — for example, pinning a fan to 0 % duty cycle under sustained load — can cause overheating and permanent hardware damage. By using this software you accept that risk. The maintainers of this fork and the upstream author are not responsible for damage to your device.
