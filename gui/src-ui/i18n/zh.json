@@ -45,6 +45,42 @@
       "title": "电池"
     }
   },
+  "led": {
+    "title": "LED 环",
+    "subtitle": "电源按键周围的灯环",
+    "auto": {
+      "title": "自动",
+      "body": "EC 根据系统状态(电源、充电、睡眠)控制 LED。选择 Static 或 Animation 以覆盖。"
+    },
+    "static": {
+      "title": "静态亮度"
+    },
+    "animation": {
+      "preview": "预览",
+      "builder": "自定义呼吸",
+      "presets": "预设"
+    },
+    "field": {
+      "max_brightness": "最大亮度",
+      "step_up": "上升速度",
+      "step_down": "下降速度",
+      "delay_at_max": "最大值停留",
+      "delay_at_min": "最小值停留"
+    },
+    "preset": {
+      "smooth": "平滑",
+      "sleep": "睡眠",
+      "alert": "警报",
+      "zen": "禅意",
+      "ping": "Ping",
+      "energetic": "活力",
+      "warning": "警告",
+      "vacuum": "真空",
+      "panic": "恐慌",
+      "sonar": "声呐",
+      "toxic": "毒性"
+    }
+  },
   "fans": {
     "title": "风扇",
     "subtitle": "基于 EC 温度的每风扇曲线",

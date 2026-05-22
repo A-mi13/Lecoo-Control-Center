@@ -45,6 +45,42 @@
       "title": "Battery"
     }
   },
+  "led": {
+    "title": "LED Ring",
+    "subtitle": "Power button ring around the chassis",
+    "auto": {
+      "title": "Auto",
+      "body": "The EC drives the LED based on system state (power, charge, sleep). Choose Static or Animation to override."
+    },
+    "static": {
+      "title": "Static brightness"
+    },
+    "animation": {
+      "preview": "Preview",
+      "builder": "Custom breath",
+      "presets": "Presets"
+    },
+    "field": {
+      "max_brightness": "Max brightness",
+      "step_up": "Step up",
+      "step_down": "Step down",
+      "delay_at_max": "Hold at max",
+      "delay_at_min": "Hold at min"
+    },
+    "preset": {
+      "smooth": "Smooth",
+      "sleep": "Sleep",
+      "alert": "Alert",
+      "zen": "Zen",
+      "ping": "Ping",
+      "energetic": "Energetic",
+      "warning": "Warning",
+      "vacuum": "Vacuum",
+      "panic": "Panic",
+      "sonar": "Sonar",
+      "toxic": "Toxic"
+    }
+  },
   "fans": {
     "title": "Fans",
     "subtitle": "Per-fan curve over EC temperature",
