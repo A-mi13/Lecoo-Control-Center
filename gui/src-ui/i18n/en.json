@@ -1,0 +1,31 @@
+{
+  "app": {
+    "name": "Lecoo Control Center"
+  },
+  "nav": {
+    "hardware": "Hardware",
+    "lighting": "Lighting",
+    "overview": "Overview",
+    "fans": "Fans",
+    "power": "Power",
+    "battery": "Battery",
+    "keyboard": "Keyboard",
+    "led": "LED Ring",
+    "settings": "Settings"
+  },
+  "connection": {
+    "disconnected": "Disconnected",
+    "connecting": "Connecting…",
+    "connected": "Connected",
+    "error": "Error"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto"
+  },
+  "language": {
+    "label": "Language"
+  }
+}

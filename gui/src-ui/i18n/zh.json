@@ -1,0 +1,31 @@
+{
+  "app": {
+    "name": "Lecoo 控制中心"
+  },
+  "nav": {
+    "hardware": "硬件",
+    "lighting": "灯光",
+    "overview": "概览",
+    "fans": "风扇",
+    "power": "电源",
+    "battery": "电池",
+    "keyboard": "键盘",
+    "led": "LED 环",
+    "settings": "设置"
+  },
+  "connection": {
+    "disconnected": "未连接",
+    "connecting": "连接中…",
+    "connected": "已连接",
+    "error": "错误"
+  },
+  "theme": {
+    "label": "主题",
+    "light": "浅色",
+    "dark": "深色",
+    "auto": "自动"
+  },
+  "language": {
+    "label": "语言"
+  }
+}

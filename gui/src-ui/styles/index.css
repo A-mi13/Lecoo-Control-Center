@@ -2,12 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+[data-theme='dark'] {
+  --color-bg: #0d1117;
+  --color-bg-elev: #161b22;
+  --color-bg-sidebar: #010409;
+  --color-border: #21262d;
+  --color-text: #c9d1d9;
+  --color-text-strong: #f0f6fc;
+  --color-mute: #6e7681;
+  --color-accent: #58a6ff;
+  --color-accent-bg: rgba(88, 166, 255, 0.12);
+  --color-ok: #56d364;
+  --color-warn: #f0883e;
+  --color-purple: #a371f7;
   color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --color-bg: #fafbfc;
+  --color-bg-elev: #ffffff;
+  --color-bg-sidebar: #f6f8fa;
+  --color-border: #d8dee4;
+  --color-text: #24292f;
+  --color-text-strong: #0d1117;
+  --color-mute: #6e7781;
+  --color-accent: #0969da;
+  --color-accent-bg: rgba(9, 105, 218, 0.10);
+  --color-ok: #1a7f37;
+  --color-warn: #bf6500;
+  --color-purple: #8250df;
+  color-scheme: light;
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }

@@ -1,3 +1,4 @@
+import path from "node:path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -9,6 +10,11 @@ export default defineConfig({
     strictPort: true,
   },
   envPrefix: ["VITE_", "TAURI_"],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src-ui"),
+    },
+  },
   build: {
     target: "es2021",
     minify: "esbuild",

@@ -12,13 +12,14 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "Lecoo Control Center",
         "width": 1120,
         "height": 720,
         "minWidth": 960,
         "minHeight": 640,
         "resizable": true,
-        "decorations": true
+        "decorations": false
       }
     ],
     "security": { "csp": null }
