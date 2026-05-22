@@ -7,6 +7,8 @@ use ipc::{
 use serde::Deserialize;
 use tauri::State;
 
+use crate::curve::FanCurve;
+use crate::curve_runner::{CurveRunner, FanCurveState};
 use crate::ipc_client::IpcClient;
 use crate::state::{AppState, ConnectionStatus, Telemetry};
 
@@ -269,4 +271,56 @@ pub fn set_led_mode(mode: PowerLedModeArg) -> Result<(), String> {
 #[tauri::command]
 pub fn restore_defaults() -> Result<(), String> {
     send_one(IpcRequest::DaemonCommand(DaemonCommand::RestoreDefaults))
+}
+
+// ---------- Fan curve ----------
+
+#[tauri::command]
+pub fn get_fan_curve(fan: FanArg, runner: State<'_, Arc<CurveRunner>>) -> FanCurveState {
+    match fan {
+        FanArg::Cpu => runner.cpu.read().clone(),
+        FanArg::Gpu => runner.gpu.read().clone(),
+    }
+}
+
+#[tauri::command]
+pub fn set_fan_curve(
+    fan: FanArg,
+    curve: FanCurve,
+    runner: State<'_, Arc<CurveRunner>>,
+) -> Result<(), String> {
+    let slot = match fan {
+        FanArg::Cpu => &runner.cpu,
+        FanArg::Gpu => &runner.gpu,
+    };
+    let mut st = slot.write();
+    st.curve = Some(curve);
+    Ok(())
+}
+
+#[tauri::command]
+pub fn set_fan_curve_enabled(
+    fan: FanArg,
+    enabled: bool,
+    runner: State<'_, Arc<CurveRunner>>,
+) -> Result<(), String> {
+    let slot = match fan {
+        FanArg::Cpu => &runner.cpu,
+        FanArg::Gpu => &runner.gpu,
+    };
+    {
+        let mut st = slot.write();
+        st.enabled = enabled;
+    }
+    // When the user turns the curve off, hand control back to EC's auto policy.
+    if !enabled {
+        let _ = send_one(IpcRequest::SetFanMode {
+            fan: match fan {
+                FanArg::Cpu => FanIndex::Cpu,
+                FanArg::Gpu => FanIndex::Gpu,
+            },
+            mode: FanMode::Auto,
+        });
+    }
+    Ok(())
 }

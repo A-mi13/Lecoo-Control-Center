@@ -45,6 +45,25 @@
       "title": "电池"
     }
   },
+  "fans": {
+    "title": "风扇",
+    "subtitle": "基于 EC 温度的每风扇曲线",
+    "live_temp": "实时温度",
+    "live_rpm": "实时转速",
+    "predicted_pwm": "曲线目标",
+    "curve_title": "曲线",
+    "presets": "预设",
+    "mode": {
+      "auto": "自动",
+      "curve": "曲线",
+      "full": "全速"
+    },
+    "preset": {
+      "silent": "静音",
+      "balanced": "均衡",
+      "aggressive": "激进"
+    }
+  },
   "power": {
     "title": "电源",
     "subtitle": "EC 电源配置",

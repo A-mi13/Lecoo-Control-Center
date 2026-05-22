@@ -45,6 +45,25 @@
       "title": "Battery"
     }
   },
+  "fans": {
+    "title": "Fans",
+    "subtitle": "Per-fan curve over EC temperature",
+    "live_temp": "Live temperature",
+    "live_rpm": "Live RPM",
+    "predicted_pwm": "Curve target",
+    "curve_title": "Curve",
+    "presets": "Presets",
+    "mode": {
+      "auto": "Auto",
+      "curve": "Curve",
+      "full": "Full"
+    },
+    "preset": {
+      "silent": "Silent",
+      "balanced": "Balanced",
+      "aggressive": "Aggressive"
+    }
+  },
   "power": {
     "title": "Power",
     "subtitle": "EC power profile",
