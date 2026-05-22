@@ -1691,6 +1691,7 @@ name = "gui"
 version = "0.4.0"
 dependencies = [
  "anyhow",
+ "bincode",
  "ipc",
  "parking_lot",
  "serde",

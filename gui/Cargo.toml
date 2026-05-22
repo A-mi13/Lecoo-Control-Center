@@ -16,6 +16,7 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 anyhow = "1.0"
+bincode = "2.0"
 ipc = { path = "../ipc" }
 tauri = { version = "2", features = ["tray-icon"] }
 tauri-plugin-shell = "2"
