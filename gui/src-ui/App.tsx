@@ -2,6 +2,7 @@ import { HashRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Sidebar } from '@/components/Sidebar';
 import { Titlebar } from '@/components/Titlebar';
+import { useTelemetrySubscription } from '@/hooks/useTelemetrySubscription';
 import Overview from '@/pages/Overview';
 import Fans from '@/pages/Fans';
 import Power from '@/pages/Power';
@@ -10,10 +11,16 @@ import Keyboard from '@/pages/Keyboard';
 import LedRing from '@/pages/LedRing';
 import Settings from '@/pages/Settings';
 
+function GlobalSubscriptions() {
+  useTelemetrySubscription();
+  return null;
+}
+
 export default function App() {
   return (
     <ThemeProvider>
       <HashRouter>
+        <GlobalSubscriptions />
         <div className="h-screen flex flex-col bg-bg text-text">
           <Titlebar />
           <div className="flex-1 flex min-h-0">

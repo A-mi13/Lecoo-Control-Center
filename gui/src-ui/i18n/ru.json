@@ -13,6 +13,38 @@
     "led": "LED-кольцо",
     "settings": "Настройки"
   },
+  "overview": {
+    "title": "Обзор",
+    "subtitle": "живая телеметрия",
+    "updated": "обновлено {{secs}} с назад",
+    "no_data": "нет данных — ожидание daemon'а",
+    "profile": {
+      "silent": "Тихий",
+      "default": "Базовый",
+      "performance": "Турбо"
+    },
+    "stat": {
+      "cpu": "Темп. CPU",
+      "system": "Темп. системы",
+      "cpu_fan": "CPU вент.",
+      "gpu_fan": "GPU вент."
+    },
+    "chart": {
+      "title": "Температуры",
+      "range": {
+        "30s": "30с",
+        "60s": "60с",
+        "5m": "5м",
+        "30m": "30м"
+      }
+    },
+    "fans": {
+      "title": "Вентиляторы"
+    },
+    "battery": {
+      "title": "Батарея"
+    }
+  },
   "connection": {
     "disconnected": "Нет связи",
     "connecting": "Соединение…",

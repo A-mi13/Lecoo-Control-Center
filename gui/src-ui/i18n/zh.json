@@ -13,6 +13,38 @@
     "led": "LED 环",
     "settings": "设置"
   },
+  "overview": {
+    "title": "概览",
+    "subtitle": "实时遥测",
+    "updated": "{{secs}} 秒前更新",
+    "no_data": "暂无数据 — 等待守护进程",
+    "profile": {
+      "silent": "静音",
+      "default": "默认",
+      "performance": "性能"
+    },
+    "stat": {
+      "cpu": "CPU 温度",
+      "system": "系统温度",
+      "cpu_fan": "CPU 风扇",
+      "gpu_fan": "GPU 风扇"
+    },
+    "chart": {
+      "title": "温度",
+      "range": {
+        "30s": "30秒",
+        "60s": "60秒",
+        "5m": "5分",
+        "30m": "30分"
+      }
+    },
+    "fans": {
+      "title": "风扇"
+    },
+    "battery": {
+      "title": "电池"
+    }
+  },
   "connection": {
     "disconnected": "未连接",
     "connecting": "连接中…",

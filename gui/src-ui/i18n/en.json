@@ -13,6 +13,38 @@
     "led": "LED Ring",
     "settings": "Settings"
   },
+  "overview": {
+    "title": "Overview",
+    "subtitle": "live telemetry",
+    "updated": "updated {{secs}}s ago",
+    "no_data": "no data yet — waiting for daemon",
+    "profile": {
+      "silent": "Silent",
+      "default": "Default",
+      "performance": "Performance"
+    },
+    "stat": {
+      "cpu": "CPU temp",
+      "system": "System temp",
+      "cpu_fan": "CPU fan",
+      "gpu_fan": "GPU fan"
+    },
+    "chart": {
+      "title": "Temperatures",
+      "range": {
+        "30s": "30s",
+        "60s": "60s",
+        "5m": "5m",
+        "30m": "30m"
+      }
+    },
+    "fans": {
+      "title": "Fans"
+    },
+    "battery": {
+      "title": "Battery"
+    }
+  },
   "connection": {
     "disconnected": "Disconnected",
     "connecting": "Connecting…",
