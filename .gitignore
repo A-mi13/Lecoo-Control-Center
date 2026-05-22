@@ -1,1 +1,15 @@
 /target
+
+# GUI build artifacts
+/gui/dist
+/gui/node_modules
+/gui/src-tauri/target
+/gui/.tauri
+/gui/src-ui/.vite
+
+# Local env
+.env
+.env.local
+
+# Brainstorm session artifacts
+.superpowers/

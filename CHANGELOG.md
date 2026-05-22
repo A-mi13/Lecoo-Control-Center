@@ -1,5 +1,21 @@
 # Changelog
 
+All notable changes to this fork will be documented here.
+This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- Desktop GUI (Tauri 2 + React) — work in progress
+- Project README rewritten to credit upstream
+- CONTRIBUTING guide and expanded .gitignore
+
+## Upstream baseline
+
+Based on `LaVashikk/Lecoo-Control-Center` at version 0.4.0. Upstream changelog preserved below.
+
+---
+
 ## [0.4.0] - 2026-05-06
 
 ### Added
