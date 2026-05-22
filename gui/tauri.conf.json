@@ -6,8 +6,9 @@
   "build": {
     "beforeDevCommand": "pnpm dev",
     "beforeBuildCommand": "pnpm build",
+    "beforeBundleCommand": "cargo build --release -p lecoo-ec-daemon --target-dir ../target",
     "devUrl": "http://localhost:5173",
-    "frontendDist": "../dist"
+    "frontendDist": "./dist"
   },
   "app": {
     "windows": [
@@ -26,7 +27,14 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
-    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.ico"]
+    "targets": ["msi"],
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.ico"],
+    "windows": {
+      "wix": {
+        "language": ["en-US"],
+        "fragmentPaths": ["wix/daemon-service.wxs"],
+        "componentRefs": ["DaemonServiceComponent"]
+      }
+    }
   }
 }

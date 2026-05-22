@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tauri-driven WiX fragment that:
+    1. Ships lecoo-ec-daemon.exe into INSTALLDIR alongside the GUI exe.
+    2. Registers it as a Windows Service called LecooControlDaemon, running
+       as LocalSystem with auto-start, so the EC stays under the daemon
+       (and the GUI never needs UAC).
+    3. Starts the service after install, stops + removes it on uninstall.
+
+  Paths are resolved relative to gui\target\release\wix\ where Tauri runs
+  candle from. Four levels up gets us to the workspace root.
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR">
+      <Component Id="DaemonServiceComponent"
+                 Guid="A1D8C7E2-91F4-4DA9-9D72-1D6B3C1FCC4F"
+                 Win64="yes">
+        <File Id="DaemonExeFile"
+              Name="lecoo-ec-daemon.exe"
+              Source="..\..\..\..\target\release\lecoo-ec-daemon.exe"
+              KeyPath="yes" />
+
+        <File Id="InpOutDll"
+              Name="inpoutx64.dll"
+              Source="..\..\..\..\libs\inpoutx64.dll" />
+
+        <ServiceInstall Id="DaemonServiceInstall"
+                        Type="ownProcess"
+                        Name="LecooControlDaemon"
+                        DisplayName="Lecoo Control Daemon"
+                        Description="Background service for Lecoo Control Center: drives the embedded controller (fans, profile, battery, LED) and exposes a local IPC endpoint to the GUI."
+                        Start="auto"
+                        Account="LocalSystem"
+                        ErrorControl="normal"
+                        Arguments="--service"
+                        Vital="yes" />
+
+        <ServiceControl Id="DaemonServiceControl"
+                        Name="LecooControlDaemon"
+                        Start="install"
+                        Stop="both"
+                        Remove="uninstall"
+                        Wait="yes" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+</Wix>
