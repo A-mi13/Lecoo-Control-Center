@@ -36,7 +36,18 @@ GUI находится в **бета**-стадии. Все семь фаз (she
 
 ## Скриншоты
 
-Скриншоты добавятся сюда после первого тэгированного релиза.
+<table>
+  <tr>
+    <td align="center"><img src="branding/screenshots/overview.png" alt="Overview" width="420"><br><sub>Overview · живая телеметрия</sub></td>
+    <td align="center"><img src="branding/screenshots/fans.png" alt="Fans" width="420"><br><sub>Fans · редактор кривой</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="branding/screenshots/led-animation.png" alt="LED Ring" width="420"><br><sub>LED Ring · конструктор анимаций</sub></td>
+    <td align="center"><img src="branding/screenshots/settings.png" alt="Settings" width="420"><br><sub>Settings · диагностика</sub></td>
+  </tr>
+</table>
+
+*(Пока в `branding/screenshots/` нет четырёх PNG, GitHub покажет иконки "broken image" — см. README в той папке, что должно быть на каждом скриншоте.)*
 
 ## Возможности
 

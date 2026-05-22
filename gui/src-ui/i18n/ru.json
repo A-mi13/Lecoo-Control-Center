@@ -182,6 +182,14 @@
       "pipe": "IPC endpoint",
       "endpoint_value": "lecoo_ctl_daemon"
     },
+    "updates": {
+      "check_button": "Проверить обновления",
+      "checking": "Проверяем…",
+      "new_available": "Доступна новая версия: {{v}}",
+      "current": "Текущая: {{v}}",
+      "up_to_date": "У вас актуальная версия ({{v}}).",
+      "open_release": "Открыть страницу релиза"
+    },
     "diagnostics": {
       "open_logs": "Открыть папку логов",
       "copy_bundle": "Скопировать диагностику",

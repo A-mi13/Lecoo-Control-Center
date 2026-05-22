@@ -36,7 +36,18 @@ The GUI is in **beta**. All seven feature phases (shell, telemetry, dashboard, p
 
 ## Screenshots
 
-Screenshots will be added here once the GUI lands its first tagged release.
+<table>
+  <tr>
+    <td align="center"><img src="branding/screenshots/overview.png" alt="Overview dashboard" width="420"><br><sub>Overview · live telemetry</sub></td>
+    <td align="center"><img src="branding/screenshots/fans.png" alt="Fan curve editor" width="420"><br><sub>Fans · curve editor</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="branding/screenshots/led-animation.png" alt="LED Ring animation builder" width="420"><br><sub>LED Ring · animation builder</sub></td>
+    <td align="center"><img src="branding/screenshots/settings.png" alt="Settings · Diagnostics" width="420"><br><sub>Settings · diagnostics</sub></td>
+  </tr>
+</table>
+
+*(GitHub will render a broken image placeholder until the four PNGs land in `branding/screenshots/` — see the README in that folder for what each file should show.)*
 
 ## Features
 

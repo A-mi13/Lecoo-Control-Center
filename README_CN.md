@@ -36,7 +36,18 @@ GUI 处于 **Beta** 阶段。全部七个功能阶段(shell、遥测、仪表盘
 
 ## 截图
 
-首个标签发布后会在这里补上截图。
+<table>
+  <tr>
+    <td align="center"><img src="branding/screenshots/overview.png" alt="Overview" width="420"><br><sub>Overview · 实时遥测</sub></td>
+    <td align="center"><img src="branding/screenshots/fans.png" alt="Fans" width="420"><br><sub>Fans · 曲线编辑器</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="branding/screenshots/led-animation.png" alt="LED Ring" width="420"><br><sub>LED Ring · 动画构建器</sub></td>
+    <td align="center"><img src="branding/screenshots/settings.png" alt="Settings" width="420"><br><sub>Settings · 诊断</sub></td>
+  </tr>
+</table>
+
+*(在 `branding/screenshots/` 放入四张 PNG 之前,GitHub 会显示损坏图片占位符 —— 详见该文件夹的 README。)*
 
 ## 功能
 

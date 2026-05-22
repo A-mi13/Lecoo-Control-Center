@@ -18,6 +18,7 @@ tauri-build = { version = "2", features = [] }
 anyhow = "1.0"
 bincode = "2.0"
 ipc = { path = "../ipc" }
+ureq = { version = "3", features = ["json"] }
 tauri = { version = "2", features = ["tray-icon"] }
 tauri-plugin-shell = "2"
 tauri-plugin-autostart = "2"

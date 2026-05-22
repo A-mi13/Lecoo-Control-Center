@@ -33,7 +33,23 @@ const REPO_URL = 'https://github.com/A-mi13/Lecoo-Control-Center';
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
-  const s = useSettingsStore();
+
+  // Subscribe to each setting individually so unrelated changes don't
+  // rerender the whole page. Pulling the whole store with useSettingsStore()
+  // also gave us a non-stable `set` reference on every render which was a
+  // foot-gun for any useEffect that mentioned it.
+  const language = useSettingsStore((s) => s.language);
+  const tempUnit = useSettingsStore((s) => s.tempUnit);
+  const launchAtStartup = useSettingsStore((s) => s.launchAtStartup);
+  const startMinimized = useSettingsStore((s) => s.startMinimized);
+  const closeToTray = useSettingsStore((s) => s.closeToTray);
+  const showTrayIcon = useSettingsStore((s) => s.showTrayIcon);
+  const pollIntervalSec = useSettingsStore((s) => s.pollIntervalSec);
+  const historyWindowMin = useSettingsStore((s) => s.historyWindowMin);
+  const autoCheckUpdates = useSettingsStore((s) => s.autoCheckUpdates);
+  const verboseLogging = useSettingsStore((s) => s.verboseLogging);
+  const setSetting = useSettingsStore((s) => s.set);
+
   const setMaxHistory = useTelemetryStore((x) => x.setMaxHistory);
   const [status, setStatus] = useState<ConnectionStatus>({ kind: 'disconnected' });
   const [toast, setToast] = useState<string | null>(null);
@@ -55,33 +71,38 @@ export default function Settings() {
   useEffect(() => {
     invoke<boolean>('get_autostart')
       .then((enabled) => {
-        if (enabled !== s.launchAtStartup) s.set('launchAtStartup', enabled);
+        if (enabled !== useSettingsStore.getState().launchAtStartup) {
+          useSettingsStore.getState().set('launchAtStartup', enabled);
+        }
       })
       .catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function applyLanguage(lang: Language) {
-    s.set('language', lang);
-    await i18n.changeLanguage(lang);
+    setSetting('language', lang);
+    try {
+      await i18n.changeLanguage(lang);
+    } catch (e) {
+      console.error('changeLanguage failed', e);
+    }
   }
 
-  async function applyTempUnit(u: TempUnit) {
-    s.set('tempUnit', u);
+  function applyTempUnit(u: TempUnit) {
+    setSetting('tempUnit', u);
   }
 
-  async function applyPoll(p: PollInterval) {
-    s.set('pollIntervalSec', p);
+  function applyPoll(p: PollInterval) {
+    setSetting('pollIntervalSec', p);
     // Telemetry poll rate is owned by the Rust poller — wired in Phase 8.
   }
 
-  async function applyHistory(h: HistoryWindow) {
-    s.set('historyWindowMin', h);
+  function applyHistory(h: HistoryWindow) {
+    setSetting('historyWindowMin', h);
     setMaxHistory(h * 60); // assumes 1 Hz poll, good enough until the rate is variable
   }
 
   async function applyAutostart(enable: boolean) {
-    s.set('launchAtStartup', enable);
+    setSetting('launchAtStartup', enable);
     try {
       await invoke('set_autostart', { enable });
     } catch (e) {
@@ -90,7 +111,7 @@ export default function Settings() {
   }
 
   async function applyVerbose(enable: boolean) {
-    s.set('verboseLogging', enable);
+    setSetting('verboseLogging', enable);
     try {
       await invoke('set_log_level', { level: enable ? 'debug' : 'info' });
     } catch (e) {
@@ -109,11 +130,38 @@ export default function Settings() {
   async function copyDiagnostics() {
     try {
       const bundle = await invoke<string>('get_diagnostics_bundle');
-      await navigator.clipboard.writeText(bundle);
-      flashToast(t('settings.diagnostics.copied'));
+      try {
+        // navigator.clipboard works in Tauri 2 webview without a separate
+        // plugin permission, but fall back to a hidden textarea selection
+        // if the user's environment blocks it.
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(bundle);
+        } else {
+          legacyCopy(bundle);
+        }
+        flashToast(t('settings.diagnostics.copied'));
+      } catch (e) {
+        console.error('clipboard write failed, trying fallback', e);
+        legacyCopy(bundle);
+        flashToast(t('settings.diagnostics.copied'));
+      }
     } catch (e) {
       console.error('copy diagnostics failed', e);
       flashToast(t('settings.diagnostics.copy_failed'));
+    }
+  }
+
+  function legacyCopy(text: string) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+    } finally {
+      document.body.removeChild(ta);
     }
   }
 
@@ -135,7 +183,7 @@ export default function Settings() {
           <ThemeToggle />
         </Row>
         <Row label={t('settings.field.language')}>
-          <Segment options={LANGS} value={s.language} onChange={applyLanguage} size="sm" />
+          <Segment options={LANGS} value={language} onChange={applyLanguage} size="sm" />
         </Row>
         <Row label={t('settings.field.temp_unit')}>
           <Segment
@@ -143,7 +191,7 @@ export default function Settings() {
               { value: 'celsius' as const, label: t('settings.temp.celsius') },
               { value: 'fahrenheit' as const, label: t('settings.temp.fahrenheit') },
             ]}
-            value={s.tempUnit}
+            value={tempUnit}
             onChange={applyTempUnit}
             size="sm"
           />
@@ -152,24 +200,24 @@ export default function Settings() {
 
       <Card title={t('settings.behavior')}>
         <Row label={t('settings.field.launch_at_startup')}>
-          <Toggle checked={s.launchAtStartup} onChange={applyAutostart} />
+          <Toggle checked={launchAtStartup} onChange={applyAutostart} />
         </Row>
         <Row label={t('settings.field.start_minimized')}>
           <Toggle
-            checked={s.startMinimized}
-            onChange={(v) => s.set('startMinimized', v)}
+            checked={startMinimized}
+            onChange={(v) => setSetting('startMinimized', v)}
           />
         </Row>
         <Row label={t('settings.field.close_to_tray')}>
           <Toggle
-            checked={s.closeToTray}
-            onChange={(v) => s.set('closeToTray', v)}
+            checked={closeToTray}
+            onChange={(v) => setSetting('closeToTray', v)}
           />
         </Row>
         <Row label={t('settings.field.show_tray_icon')}>
           <Toggle
-            checked={s.showTrayIcon}
-            onChange={(v) => s.set('showTrayIcon', v)}
+            checked={showTrayIcon}
+            onChange={(v) => setSetting('showTrayIcon', v)}
           />
         </Row>
       </Card>
@@ -182,7 +230,7 @@ export default function Settings() {
               { value: 2 as PollInterval, label: t('settings.poll.2') },
               { value: 5 as PollInterval, label: t('settings.poll.5') },
             ]}
-            value={s.pollIntervalSec}
+            value={pollIntervalSec}
             onChange={applyPoll}
             size="sm"
           />
@@ -194,7 +242,7 @@ export default function Settings() {
               { value: 30 as HistoryWindow, label: t('settings.history.30') },
               { value: 120 as HistoryWindow, label: t('settings.history.120') },
             ]}
-            value={s.historyWindowMin}
+            value={historyWindowMin}
             onChange={applyHistory}
             size="sm"
           />
@@ -204,10 +252,11 @@ export default function Settings() {
       <Card title={t('settings.updates_group')}>
         <Row label={t('settings.field.auto_check_updates')}>
           <Toggle
-            checked={s.autoCheckUpdates}
-            onChange={(v) => s.set('autoCheckUpdates', v)}
+            checked={autoCheckUpdates}
+            onChange={(v) => setSetting('autoCheckUpdates', v)}
           />
         </Row>
+        <UpdateChecker t={t} />
       </Card>
 
       <Card title={t('settings.daemon_group')}>
@@ -229,7 +278,7 @@ export default function Settings() {
 
       <Card title={t('settings.diagnostics_group')}>
         <Row label={t('settings.field.verbose_logging')}>
-          <Toggle checked={s.verboseLogging} onChange={applyVerbose} />
+          <Toggle checked={verboseLogging} onChange={applyVerbose} />
         </Row>
         <p className="text-[11px] font-mono text-mute -mt-1">
           {t('settings.diagnostics.verbose_hint')}
@@ -330,4 +379,84 @@ function daemonStatusLabel(status: ConnectionStatus, t: (k: string) => string): 
     default:
       return t('connection.disconnected');
   }
+}
+
+interface UpdateCheck {
+  currentVersion: string;
+  latestVersion: string;
+  updateAvailable: boolean;
+  releaseUrl: string;
+  releaseName: string | null;
+  releaseNotes: string | null;
+  prerelease: boolean;
+}
+
+function UpdateChecker({ t }: { t: (k: string) => string }) {
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<UpdateCheck | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function check() {
+    if (busy) return;
+    setBusy(true);
+    setErr(null);
+    setResult(null);
+    try {
+      const r = await invoke<UpdateCheck>('check_for_updates');
+      setResult(r);
+    } catch (e) {
+      setErr(String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-2 mt-2">
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={check}
+          disabled={busy}
+          className="px-3 py-1.5 text-[11px] font-mono uppercase tracking-wide rounded-md border border-border text-text hover:border-accent hover:text-accent transition disabled:opacity-50"
+        >
+          {busy
+            ? t('settings.updates.checking')
+            : t('settings.updates.check_button')}
+        </button>
+      </div>
+
+      {result ? (
+        <div className="text-xs font-mono text-text">
+          {result.updateAvailable ? (
+            <>
+              <p className="text-ok">
+                {t('settings.updates.new_available').replace('{{v}}', result.latestVersion)}
+              </p>
+              <p className="text-mute">
+                {t('settings.updates.current').replace('{{v}}', result.currentVersion)}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  openExternal(result.releaseUrl).catch((e) =>
+                    console.error('openExternal failed', e),
+                  );
+                }}
+                className="mt-1 text-accent hover:underline"
+              >
+                {t('settings.updates.open_release')} ↗
+              </button>
+            </>
+          ) : (
+            <p className="text-mute">
+              {t('settings.updates.up_to_date').replace('{{v}}', result.currentVersion)}
+            </p>
+          )}
+        </div>
+      ) : null}
+
+      {err ? <p className="text-xs font-mono text-warn">{err}</p> : null}
+    </div>
+  );
 }

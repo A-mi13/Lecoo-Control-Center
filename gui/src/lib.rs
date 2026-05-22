@@ -7,6 +7,7 @@ pub mod poller;
 pub mod state;
 pub mod tauri_cmds;
 pub mod tray;
+pub mod updates;
 
 use tauri::Manager;
 
@@ -45,6 +46,7 @@ pub fn run() {
             tauri_cmds::set_autostart,
             tauri_cmds::get_autostart,
             tauri_cmds::reconnect_now,
+            tauri_cmds::check_for_updates,
         ])
         .setup(move |app| {
             poller::start(app.handle().clone());

@@ -15,6 +15,7 @@ use crate::diagnostics;
 use crate::ipc_client::IpcClient;
 use crate::logging::LogControl;
 use crate::state::{AppState, ConnectionStatus, Telemetry};
+use crate::updates::{self, UpdateCheck};
 
 #[tauri::command]
 pub fn get_telemetry(state: State<'_, Arc<AppState>>) -> Option<Telemetry> {
@@ -313,6 +314,13 @@ pub fn set_fan_curve(
 #[tauri::command]
 pub fn reconnect_now(state: State<'_, Arc<AppState>>) {
     state.reconnect_signal.notify_one();
+}
+
+#[tauri::command]
+pub async fn check_for_updates() -> Result<UpdateCheck, String> {
+    tokio::task::spawn_blocking(updates::check_for_update)
+        .await
+        .map_err(|e| e.to_string())?
 }
 
 // ---------- Autostart ----------

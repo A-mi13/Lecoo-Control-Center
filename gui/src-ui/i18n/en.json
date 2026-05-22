@@ -182,6 +182,14 @@
       "pipe": "IPC endpoint",
       "endpoint_value": "lecoo_ctl_daemon"
     },
+    "updates": {
+      "check_button": "Check for updates",
+      "checking": "Checking…",
+      "new_available": "New version available: {{v}}",
+      "current": "Current: {{v}}",
+      "up_to_date": "You are on the latest version ({{v}}).",
+      "open_release": "Open release page"
+    },
     "diagnostics": {
       "open_logs": "Open log folder",
       "copy_bundle": "Copy diagnostics",

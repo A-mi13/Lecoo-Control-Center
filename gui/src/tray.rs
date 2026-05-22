@@ -3,7 +3,10 @@ use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{AppHandle, Manager};
 
+use crate::state::Telemetry;
 use crate::tauri_cmds;
+
+pub const TRAY_ID: &str = "main-tray";
 
 pub fn install(app: &AppHandle) -> tauri::Result<()> {
     let show = MenuItem::with_id(app, "show", "Open window", true, None::<&str>)?;
@@ -30,7 +33,13 @@ pub fn install(app: &AppHandle) -> tauri::Result<()> {
         &[&show, &sep1, &profile_menu, &fan_menu, &sep2, &quit],
     )?;
 
-    TrayIconBuilder::new()
+    let icon = app
+        .default_window_icon()
+        .cloned()
+        .ok_or_else(|| tauri::Error::Anyhow(anyhow::anyhow!("no default window icon")))?;
+
+    TrayIconBuilder::with_id(TRAY_ID)
+        .icon(icon)
         .tooltip("Lecoo Control Center")
         .menu(&menu)
         .on_menu_event(|app, event| match event.id.as_ref() {
@@ -83,5 +92,20 @@ fn bring_window_to_front(app: &AppHandle) {
         let _ = w.show();
         let _ = w.unminimize();
         let _ = w.set_focus();
+    }
+}
+
+/// Update the tray icon's tooltip to reflect the latest telemetry sample.
+/// Called from the poller on each successful read.
+pub fn update_tooltip(app: &AppHandle, telem: &Telemetry) {
+    if let Some(tray) = app.tray_by_id(TRAY_ID) {
+        let tip = format!(
+            "Lecoo Control Center\nCPU {}°C · CPU fan {} rpm\nSys {}°C · GPU fan {} rpm",
+            telem.cpu_temp_c.round() as i32,
+            telem.cpu_fan_rpm,
+            telem.sys_temp_c.round() as i32,
+            telem.gpu_fan_rpm,
+        );
+        let _ = tray.set_tooltip(Some(tip));
     }
 }

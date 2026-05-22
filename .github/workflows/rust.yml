@@ -1,27 +1,80 @@
-name: Rust
+name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  workspace:
+    name: Workspace · ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false 
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Build
-      run: cargo build --verbose
-      
-    - name: Run tests
-      run: cargo test --verbose
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-ci-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-ci-
+
+      # The GUI crate links against tauri's webview2/wry stack which only
+      # builds on Windows. Skip it on Linux runners.
+      - name: Build (Linux, exclude gui)
+        if: runner.os == 'Linux'
+        run: cargo build --workspace --exclude gui --verbose
+
+      - name: Test (Linux, exclude gui)
+        if: runner.os == 'Linux'
+        run: cargo test --workspace --exclude gui --verbose
+
+      - name: Build (Windows, full workspace)
+        if: runner.os == 'Windows'
+        run: cargo build --workspace --verbose
+
+      - name: Test (Windows, full workspace)
+        if: runner.os == 'Windows'
+        run: cargo test --workspace --verbose
+
+  ui:
+    name: UI tests (vitest + tsc)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Install GUI dependencies
+        working-directory: gui
+        run: pnpm install --frozen-lockfile
+
+      - name: Type-check
+        working-directory: gui
+        run: pnpm exec tsc --noEmit
+
+      - name: Run vitest
+        working-directory: gui
+        run: pnpm test

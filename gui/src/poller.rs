@@ -5,6 +5,7 @@ use tauri::{AppHandle, Emitter, Manager, async_runtime};
 
 use crate::ipc_client::IpcClient;
 use crate::state::{AppState, ConnectionStatus};
+use crate::tray;
 
 const POLL_INTERVAL_MS: u64 = 1000;
 const RECONNECT_DELAY_MS: u64 = 2000;
@@ -47,6 +48,7 @@ async fn run(app: AppHandle) {
                 Ok(t) => {
                     *state.last_telemetry.write() = Some(t.clone());
                     let _ = app.emit("telemetry", &t);
+                    tray::update_tooltip(&app, &t);
                 }
                 Err(e) => {
                     let msg = e.to_string();
