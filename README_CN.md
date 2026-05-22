@@ -1,181 +1,143 @@
 <div align="center">
-<img src="branding\logo-2.png" alt="Logo" >
+<img src="branding/logo-2.png" alt="Lecoo Control Center logo">
 
-<h3 align="center">
-Lecoo控制中心是一个逆向工程的底层嵌入式控制器（EC）守护进程和命令行界面，专为基于Emdoor底盘的笔记本电脑（如Lecoo Pro 14 / Lecoo N155）设计。它提供对散热、功耗限制和灯光的直接硬件级控制，替代了不存在的官方软件。
-</h3>
-</div>
-<div align="center">
+<h1>Lecoo 控制中心</h1>
 
-[![GitHub Release](https://img.shields.io/github/v/release/LaVashikk/Lecoo-Control-Center?color=orange)](https://github.com/LaVashikk/Lecoo-Control-Center/releases/latest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/LaVashikk/Lecoo-Control-Center/blob/main/LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey.svg)]()
-[![Language](https://img.shields.io/badge/language-Rust-orange.svg)]()
+<p>
+面向 Lecoo / Emdoor 笔记本的桌面控制中心:实时遥测、风扇曲线、电源配置、电池充电限制、键盘背光与机身后部 LED 环 —— 全部通过一个与笔记本嵌入式控制器(EC)通信的 Windows 服务驱动。
+</p>
 
-🇷🇺 [Russian Readme here](README_RU.md)
-CN [中文 Readme 在这](README_RU.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows-0078D6.svg)](https://github.com/A-mi13/Lecoo-Control-Center)
+[![Built with Tauri 2](https://img.shields.io/badge/built%20with-Tauri%202-24C8DB.svg)](https://tauri.app/)
+[![Language](https://img.shields.io/badge/language-Rust%20%2B%20React-orange.svg)](https://github.com/A-mi13/Lecoo-Control-Center)
+[![Status](https://img.shields.io/badge/status-beta-blue.svg)](https://github.com/A-mi13/Lecoo-Control-Center)
 
 </div>
 
-## ⚠️ 重要免责声明
+**语言:** [English](README.md) · [中文](README_CN.md) · [Русский](README_RU.md)
 
-本软件直接与您系统的硬件交互，特别是嵌入式控制器（ITE IT5570/IT8987）的HRAM窗口和底层I/O端口。不正确的配置（例如在高负载下将自定义风扇曲线设置为0 RPM）可能导致过热和不可逆转的硬件损坏。
+## 关于此分叉
 
-使用本软件即表示您承认这些风险。作者对您设备造成的任何损坏不承担责任。使用风险自负。
+本仓库 fork 自 [LaVashikk/Lecoo-Control-Center](https://github.com/LaVashikk/Lecoo-Control-Center) —— 原项目逆向了 Lecoo Pro 14(N155)系列笔记本上的 ITE IT5570 / IT8987 EC,并在其之上构建了一个 Rust 守护进程和 `lecoo-ctrl` CLI。**所有 EC 研究、IPC 协议、守护进程和 CLI 的功劳归 LaVashikk。**
+
+本分叉的新增/改动:
+
+- **Tauri 2 + React 桌面 GUI** —— 完整的控制界面:实时温度/转速磁贴、带时间窗的 uPlot 温度图、可拖拽的 SVG 风扇曲线编辑器(含预设)、电源配置与 FlexiCharger 切换、键盘背光实时预览、LED 环呼吸动画构建器、自定义标题栏(带连接状态)、托盘菜单(快速切换配置/风扇)、自启动、深浅自动主题,以及英语 / 俄语 / 中文本地化。*(此分叉存在的主要原因。)*
+- **将守护进程注册为 Windows 服务的 MSI 安装包** —— 单个 `Lecoo Control Center_*.msi` 会安装 GUI、守护进程和 `inpoutx64.dll`,并将 `LecooControlDaemon` 注册为 LocalSystem 自启动服务。安装后 GUI 像普通程序一样打开 —— 无 UAC 提示,无需手动以管理员身份运行。
+- **应用内诊断,便于报告 Bug** —— Settings → Diagnostics → Copy diagnostics 会把 GUI 版本、操作系统信息、最近的守护进程错误和当前日志尾部打包为 markdown,直接粘贴到 GitHub issue 即可。Verbose logging 也在同一界面开关。
+- **守护进程改进(此分叉规划中)** —— 服务端风扇曲线评估、休眠唤醒后的状态恢复、Windows 11 25H2 自启动修复、EC I/O 锁竞争保护。进度记录在 [CHANGELOG.md](CHANGELOG.md)。
+
+其余部分 —— EC HRAM 探测、PWM 控制、FlexiCharger 阈值、LED 环动画、IPC 线协议 —— 全部沿用上游。
+
+## 状态
+
+GUI 处于 **Beta** 阶段。全部七个功能阶段(shell、遥测、仪表盘、power/battery/keyboard、风扇曲线、LED 环、设置 + 托盘)已实现,可以构建出可用的 MSI。距离 v1.0 标签发布,还差守护进程侧的改进和带签名的发布流程。
+
+## 截图
+
+首个标签发布后会在这里补上截图。
 
 ## 功能
 
-  * **系统监控：** 读取CPU/系统温度和风扇速度（RPM）。
-  * **电源管理：** 在预定义的EC电源配置文件之间切换（安静、默认、性能）。
-  * **温度控制：** 独立管理CPU和GPU风扇（自动、全速或自定义PWM占空比）。
-  * **电池健康（FlexiCharger）：** 设置自定义电池充电限制以延长电池寿命（完全、高、平衡、寿命、桌面模式）。
-  * **灯光控制：** 调整键盘背光亮度。
-  * **后部LED环控制：** 配置后部电源LED的静态亮度或硬件驱动的呼吸动画。
+- ✨ **实时遥测** —— CPU 与系统温度,CPU/GPU 风扇 RPM,通过 IPC 每秒刷新。最长 30 分钟的历史驱动温度图(30 秒 / 60 秒 / 5 分 / 30 分时间窗)与四个带 sparkline 的统计磁贴。
+- 🌡️ **风扇曲线** —— CPU 与 GPU 的交互式 SVG 编辑器,拖拽点移动,双击新增,右键删除。当前温度沿曲线移动,可直观看到对应占空比。三个起步预设(Silent / Balanced / Aggressive)。当前由 500 ms 客户端 runner 评估;服务端评估为守护进程侧规划。
+- ⚡ **电源配置** —— 仪表盘、Power 页面与系统托盘均可一键切换 Silent / Default / Performance。
+- 🔋 **电池充电限制(FlexiCharger)** —— Full / High / Balanced / Maximum Lifespan / Desk Mode,每项标注真实百分比范围与简短说明。
+- ⌨️ **键盘背光** —— Off / Low / Medium / High 预设以及 0–255 的自定义滑块。三排键盘预览实时跟随,所见即所得。
+- 💡 **后部 LED 环** —— Auto(交给 EC)、Static(0–255 滑块 + 发光环预览)或 Animation:完整呼吸构造器(最大亮度、上升/下降步长、最大/最小处停留)与十一个命名预设(smooth、sleep、alert、zen、ping、energetic、warning、vacuum、panic、sonar、toxic),每个预设带缩略呼吸曲线。
+- 🎨 **主题** —— 浅色、深色、自动(跟随 `prefers-color-scheme`)。色彩通过 CSS 变量,图表、sparkline 与 LED 预览始终与主题一致。
+- 🌍 **本地化** —— 内置 English、Русский、中文。在 Settings 中切换并持久化。
+- 📌 **系统托盘** —— 左键打开窗口;菜单含 Power 配置子菜单与风扇模式子菜单;关闭窗口最小化到托盘,Quit 才是真正退出。
+- 🔧 **应用内诊断** —— 打开日志目录按钮、一键 Copy diagnostics、runtime Verbose logging 开关。详见下文 *报告 Bug*。
 
-## 支持的硬件
-
-本软件主要在Lecoo Pro 14（Lecoo N155）上开发和测试。不同版本的支持情况如下：
-
-| 型号 | 主板版本 | EC芯片 | 状态 |
-| :--- | :--- | :--- | :--- |
-| Lecoo Pro 14 Amd (H255) | N155A | IT5571-07 | 确认支持 |
-| Lecoo Pro 14 Intel (Core Ultra 5) | N155D | IT5570-02 | 支持除了电源LED控制以外的其他功能 |
-| Lecoo Pro 14 Intel (i5-13420H) | N155C | IT5570? | 可能支持 |
-
-**注意：** 本软件理论上可能适用于其他使用ITE IT5570或IT8987嵌入式控制器的基于Emdoor的笔记本电脑，因为守护进程包含基本的HRAM偏移自动检测功能。
-
-如果您成功在未列出的硬件版本或不同的Emdoor底盘上运行此软件，请打开一个issue或联系我以更新兼容性列表！
+底层 CLI(`lecoo-ctrl ...`)命令 —— 见 [上游 README](https://github.com/LaVashikk/Lecoo-Control-Center)。CLI 在此分叉保留未改。
 
 ## 安装
 
-### ⚠️ 推荐：使用预编译二进制文件
+推荐路径是 MSI:
 
-**除非您是开发人员，否则请勿从源代码构建！** 请下载最新的预编译版本：
+1. 从 [Releases 页面](https://github.com/A-mi13/Lecoo-Control-Center/releases) 拿到最新的 `Lecoo Control Center_*.msi`(首个标签发布后),**或** 按下文从源码自行构建。
+2. 以管理员身份运行。安装包会把 GUI 与守护进程复制到 `C:\Program Files\Lecoo Control Center\`,并将守护进程注册为名为 `LecooControlDaemon` 的 Windows 服务(LocalSystem,自启动)。
+3. 安装完成后,从开始菜单打开 **Lecoo Control Center**,以普通用户身份启动 —— 服务已经在后台运行并接管 EC 访问。
 
-👉 **[下载最新版本](https://github.com/LaVashikk/Lecoo-Control-Center/releases/latest)**
+验证服务:
 
-#### Windows 安装
-
-1. 从发布页面下载 `lecoo-*-windows.zip` 压缩包。
-2. 将压缩包解压到任意文件夹。
-3. 右键点击 `install.bat` 并选择 **"以管理员身份运行"**。
-4. 打开新的终端窗口并运行 `lecoo-ctrl help` 以验证安装。
-
-#### Linux 安装
-
-1. 从发布页面下载 `lecoo-*-linux.tar.gz` 压缩包。
-2. 解压压缩包：`tar -xzf lecoo-*-linux.tar.gz`
-3. 进入解压后的文件夹并运行：`sudo ./install.sh`
-4. 使用 `lecoo-ctrl` 命令与守护进程交互。
-
-## 已知问题
-
-* **Windows 11守护进程自动启动：** 后台守护进程目前在Windows 11上无法自动启动。根本原因仍在调查中。
-* **电源丢失时FlexiCharger重置：** 如果笔记本电脑关机并从墙上拔下超过5分钟，嵌入式控制器（EC）会清除其内存并重置充电限制。如果您在启动前插上笔记本电脑，电池将充电至100%。但是，一旦系统启动且守护进程初始化，电池会自然放电回您配置的限制并恢复正常行为。
-* **自定义LED模式下的充电指示器：** 当后部LED环设置为`custom`模式时，标准电池充电指示器停止工作。
-* **硬关机后LED环保持开启：** 如果在后部LED环处于`custom`模式时执行硬关机（按住电源按钮），环将保持点亮。**解决方法：** 打开笔记本电脑并正常关机。
-* **与官方软件的冲突：** 使用`power`命令调整TDP配置文件可能与制造商的官方软件（`PowerModeUtility`）冲突。强烈建议一次只使用这些工具中的一个。
-* **反作弊软件 (Windows)：** 某些反作弊系统（如 FaceIT）可能会终止守护进程。这是因为守护进程利用官方制造商驱动程序来访问嵌入式控制器。
-* **Secure Boot 与内核锁定 (Linux)：** 在启用 Secure Boot 的发行版（如 Fedora）上，由于内核锁定策略，守护进程目前无法访问底层 I/O 端口（`/dev/port`）。此限制将在以后的更新中解决。
-
-## 使用方法（CLI）
-
-守护进程在后台运行。您使用`lecoo-ctrl`命令行工具与其交互。
-
-<img src="branding\cli.jpg" alt="lecoo-ctrl" width=50% >
-
-以下是`lecoo-ctrl`的主要命令：
-
-### 系统信息与监控
-
-  * `lecoo-ctrl help` - 显示可用命令及其用法。
-  * `lecoo-ctrl info` - 检索基本EC信息和守护进程版本。
-  * `lecoo-ctrl temps` - 显示当前CPU和系统温度。
-  * `lecoo-ctrl fans` - 显示当前CPU和GPU风扇速度（RPM）。
-
-### 电源与电池设置
-
-  * `lecoo-ctrl power <silent|default|perf>` - 应用特定的电源/TDP配置文件。
-      * *示例：* `lecoo-ctrl power perf`
-  * `lecoo-ctrl charge <full|high|balanced|lifespan|desk>` - 设置电池充电阈值（FlexiCharger）。
-      * *示例：* `lecoo-ctrl charge desk`（限制充电至40-50%，适用于永久AC使用）。
-      * 运行不带参数的`lecoo-ctrl charge`以查看当前限制和电池容量。
-
-### 温度控制
-
-  * `lecoo-ctrl fan <cpu|gpu> <auto|full|custom> [value]` - 控制风扇行为。
-      * *示例（自动）：* `lecoo-ctrl fan cpu auto`
-      * *示例（最大速度）：* `lecoo-ctrl fan gpu full`
-      * *示例（自定义PWM）：* `lecoo-ctrl fan cpu custom 150`（设置自定义占空比）。
-
-### 灯光控制
-
-  * `lecoo-ctrl kbd <0|1|2|3>` - 设置键盘背光级别（0为关闭，3为最大）。
-  * `lecoo-ctrl led <auto|custom>` - 控制后部LED环。
-      * *示例：* `lecoo-ctrl led custom 50`
-
-## GUI
-
-图形用户界面（GUI）目前正在开发中，将在未来版本中提供。
-
-## 遥测与数据收集
-
-为了帮助改进软件 - 特别是在不同主板版本上完善HRAM自动检测逻辑并捕获意外的守护进程崩溃 - 该项目包含一个**可选的、完全匿名的遥测系统**。
-
-**收集的内容：**
-
-  * 仅微控制器数据（EC芯片版本，HRAM内存偏移）。
-  * CPU名称。
-  * 基本运行状态（温度，风扇RPM，活动电源配置文件）。
-  * 守护进程失败时的崩溃日志（Panic跟踪）。
-
-**不收集的内容：**
-
-  * 绝对不收集操作系统数据、用户名、IP地址、MAC地址或个人信息。
-
-遥测默认启用，以支持项目的发展。如果您希望选择退出，可以随时使用以下命令禁用它：
-
-```bash
-lecoo-ctrl daemon telemetry disable
+```powershell
+sc query LecooControlDaemon
+# 应见: STATE : 4 RUNNING
 ```
 
-## 从源码构建（开发人员）
+干净卸载:Windows 设置 → 应用。安装包会自行停止并注销服务。
 
-确保您已安装Rust工具链。
+## 从源码构建
 
-克隆存储库：
+需要:
+
+- Rust 稳定版(1.80+),通过 [rustup](https://rustup.rs/) 安装。
+- Node.js 20+ 与 pnpm 9+(用于 GUI 前端)。
+- [Tauri 2 前置依赖](https://v2.tauri.app/start/prerequisites/)。Windows 上即 MSVC 构建工具 + WebView2(Windows 11 已自带)。
 
 ```bash
-git clone https://github.com/LaVashikk/Lecoo-Control-Center.git
+git clone https://github.com/A-mi13/Lecoo-Control-Center.git
 cd Lecoo-Control-Center
+
+# 守护进程 + CLI(release)
+cargo build --release -p lecoo-ec-daemon
+cargo build --release -p cli
+
+# GUI 安装包(MSI)
+cd gui
+pnpm install
+pnpm tauri build
 ```
 
-您可以使用标准Cargo命令构建项目，或使用位于`.cargo/config.toml`中的预定义别名：
+`pnpm tauri build` 输出一个 MSI:
 
-**Windows：**
-
-```bash
-cargo build-win       # 构建守护进程
-cargo build-ctrl-win  # 构建CLI客户端
+```
+target/release/bundle/msi/Lecoo Control Center_<version>_x64_en-US.msi
 ```
 
-**Linux：**
+该 MSI 包含守护进程(bundle 步骤前自动重建)、来自 `libs/` 的 `inpoutx64.dll` 与 GUI 本身,并按官方安装包同样的方式注册 Windows 服务。
 
-```bash
-cargo build-linux       # 构建守护进程
-cargo build-ctrl-linux  # 构建CLI客户端
+GUI 日常开发:`pnpm tauri dev` 在 `localhost:5173` 上启动 Vite 并打开窗口。Rust 端会重试连接守护进程;若服务未安装,连接指示会显示 "Daemon not reachable"。
+
+## 报告 Bug
+
+如果某处行为异常,最便捷的提交 Issue 方式来自 GUI 本身:
+
+1. 打开 **Settings → Diagnostics → Copy diagnostics**。剪贴板会得到一个 markdown,包含 GUI 版本、OS 信息、最近的守护进程错误以及当前日志尾部。
+2. 粘贴到新 Issue:<https://github.com/A-mi13/Lecoo-Control-Center/issues>。
+
+如果问题难以稳定复现,先打开 **Verbose logging**,复现一次,再 Copy diagnostics —— 输出会包含 `debug` 级日志。旁边的 "Open log folder" 会打开 `%LOCALAPPDATA%\Lecoo Control Center\logs\`,每日轮转的日志文件在那里。
+
+明显属于守护进程 / CLI / EC 层的问题也欢迎反馈到上游:<https://github.com/LaVashikk/Lecoo-Control-Center/issues> —— 那里关注的人更多,本仓库适用的修复也会回流。
+
+## 架构
+
+Cargo workspace。主要成员:
+
+```
+Lecoo-Control-Center/
+├── ipc/        # 共享类型与 named-pipe IPC 协议(bincode Encode/Decode)
+├── daemon/     # 后台服务:EC 驱动、IPC 服务端、服务生命周期
+├── cli/        # `lecoo-ctrl` 命令行
+├── gui/        # Tauri 2 桌面应用(Rust 后端 + React/TS 前端)
+└── libs/       # 原生依赖(inpoutx64.dll)
 ```
 
-## 许可证与支持
+GUI 通过与 CLI 完全相同的 named pipe(`lecoo_ctl_daemon`)与守护进程通信,因此二者可以并存。GUI 的 Rust 端拥有 1 Hz 轮询器,向 WebView 派发 `telemetry` 与 `connection-status` 事件;用户操作(设定风扇模式、应用曲线、切换配置……)通过 Tauri 命令回到同一 IPC 通道。
 
-本项目是开源的，根据MIT许可证授权。有关更多详细信息，请参阅[LICENSE](LICENSE)文件。
+## 许可证
 
-如果您发现此工具有用并希望支持其持续开发，请考虑请我喝杯咖啡（或啤酒，谁知道呢，哈哈）！
+采用 [MIT License](LICENSE),与上游一致。
 
-* **国际：** [通过Lava.top捐赠](https://app.lava.top/lavashik?tabId=donate)
-* **俄罗斯：** [通过CloudTips捐赠](https://pay.cloudtips.ru/p/7e960f26)
-* **中国：** [支付宝](branding/alipay.jpg)
-* **加密货币：**
-  * **SOL (Solana)：** `CvbAT3VduADYyGRBZDq5CD3kLYcYYjYjFzgWFftsbgAB`
-  * **ETH (ERC-20)：** `0x44B03F26B4dc7b8AcBBCFc456e4181872386a8D8`
-  * **BTC (Native Segwit)：** `bc1q3sej9r9v9syamjanq7mg6a7002pc4m6d6qnv6k`
+## 致谢
+
+- **LaVashikk** —— [Lecoo-Control-Center](https://github.com/LaVashikk/Lecoo-Control-Center) 原作者。逆向了 ITE IT5570 / IT8987 EC 的 HRAM 布局,设计了 IPC 协议,实现了 Rust 守护进程与 `lecoo-ctrl` CLI。没有他的工作,这个分叉无从谈起;此处对 EC / 守护进程 / CLI 层做的修复也以回流上游为目标。
+- **[@A-mi13](https://github.com/A-mi13)** —— 本分叉维护者;负责 Tauri 2 + React GUI、MSI 安装包以及 *关于此分叉* 中列出的守护进程改进。
+- 更广泛的 Lecoo / Emdoor 笔记本社区 —— 在上游仓库贡献了主板版本与 EC offset 报告。
+
+## 免责声明
+
+本软件直接驱动笔记本的嵌入式控制器(EC)。错误配置 —— 例如在持续负载下将风扇钉在 0% 占空比 —— 可能导致过热与硬件永久损坏。**使用本软件即表示你接受该风险。** 本分叉维护者与上游作者均不对设备损坏负责。
