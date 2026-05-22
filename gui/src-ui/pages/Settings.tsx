@@ -78,6 +78,18 @@ export default function Settings() {
       .catch(() => {});
   }, []);
 
+  // Sync settings.language with whatever i18next actually resolved to.
+  // Without this the UI can render Russian (because the browser detector
+  // picked it) while the Settings segment still shows English from the
+  // default-initialised store. Cheap, runs once per mount.
+  useEffect(() => {
+    const resolved = (i18n.resolvedLanguage ?? i18n.language ?? '').toLowerCase().split('-')[0];
+    if ((resolved === 'en' || resolved === 'ru' || resolved === 'zh') && resolved !== language) {
+      setSetting('language', resolved as Language);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.resolvedLanguage]);
+
   async function applyLanguage(lang: Language) {
     setSetting('language', lang);
     try {

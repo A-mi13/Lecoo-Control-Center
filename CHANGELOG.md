@@ -5,10 +5,155 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 ## [Unreleased]
 
+(nothing yet — the next entry will land here.)
+
+## [0.1.0-beta] - 2026-05-22
+
+First public build of the A-mi13 fork. Ships the GUI, the MSI installer
+that registers the daemon as a Windows service, and the diagnostics
+plumbing needed for sensible bug reports.
+
 ### Added
-- Desktop GUI (Tauri 2 + React) — work in progress
-- Project README rewritten to credit upstream
-- CONTRIBUTING guide and expanded .gitignore
+
+#### GUI — overall shell
+- Tauri 2 + React + TypeScript desktop app under `gui/`.
+- Custom titlebar with macOS-style traffic-light buttons and a live
+  connection-status pill driven by the Rust poller.
+- Sidebar navigation with grouped sections (Hardware, Lighting, Settings)
+  and active-route highlighting.
+- Dark / Light / Auto theme, all colours driven from CSS variables so
+  charts, sparklines and the LED preview ring follow the active theme.
+- English, Русский and 中文 translations. Language is detected from the
+  persisted store first, then `localStorage`, then the browser.
+
+#### Overview dashboard
+- Four stat tiles (CPU temp, system temp, CPU fan RPM, GPU fan RPM) with
+  inline-SVG sparklines. The CPU tile turns warning-red at ≥ 85 °C.
+- uPlot temperature chart with selectable time ranges (30 s / 60 s / 5 m /
+  30 m), drawn from a bounded telemetry history (up to 30 min).
+- Power-profile segmented control (Silent / Default / Performance) that
+  round-trips through `set_power_profile`.
+- Fans summary card with per-fan RPM bars and a Battery placeholder.
+
+#### Fan curves
+- Per-fan SVG editor for CPU and GPU. Drag points to move, double-click
+  to add, right-click to remove (minimum two points enforced). A live
+  cursor rides the curve at the current temperature; the > 80 °C area is
+  shaded as a soft warning.
+- Three starter presets (Silent / Balanced / Aggressive).
+- Mode segment (Auto / Curve / Full). Auto and Full hand control back to
+  the EC; Curve activates the client-side runner.
+- Client-side runner: a 500 ms Tokio task evaluates the curve against the
+  latest telemetry sample, maps percentages into the EC duty cycle range
+  (0–220), and pushes `SetFanMode::Custom` over IPC. *(Server-side
+  evaluation is the next milestone — see "Known limitations".)*
+
+#### Power / Battery / Keyboard
+- Power page with the profile segment, per-profile description, and an
+  EC diagnostics card (EC value + applied-at timestamp).
+- Battery page exposes all five FlexiCharger limits (Full / High /
+  Balanced / Maximum Lifespan / Desk Mode) with real percentage ranges
+  and a one-line rationale per option.
+- Keyboard page offers Off / Low / Medium / High presets plus a 0–255
+  custom slider. A three-row mini-keyboard preview lights up in real
+  time so the brightness is honest before the daemon round-trips.
+
+#### LED Ring
+- Three modes: Auto (let the EC drive it), Static (slider 0–255 with a
+  glowing preview ring), Animation (a full `BreathConfig` builder).
+- 11 named animation presets mirroring the upstream `ipc::BreathConfig`
+  constants (smooth, sleep, alert, zen, ping, energetic, warning,
+  vacuum, panic, sonar, toxic). Each preset tile has its own breath-curve
+  thumbnail so you can preview the shape without applying it.
+- Live preview ring driven by `requestAnimationFrame`, sampling the
+  same breath equation the EC will run.
+
+#### System tray
+- Tray icon shown with the real app icon (the previous placeholder
+  1×1 PNGs are gone).
+- Tooltip is live: CPU temp, system temp, CPU fan RPM and GPU fan RPM
+  refresh on every poller tick.
+- Menu offers Open window, Power-profile submenu, Fans submenu, and
+  Quit. Left-clicking the icon brings the window to the front.
+- Closing the window hides it instead of exiting; Quit in the tray menu
+  is the real way out.
+
+#### Settings
+- Six grouped cards: Appearance, Behavior, Telemetry, Updates, Daemon,
+  Diagnostics, plus an About card. Every change applies immediately.
+- Autostart toggle uses `tauri-plugin-autostart` to register / remove the
+  per-user `Run` key. Settings reads the OS state at mount so the toggle
+  never lies about reality.
+- Updates card has a "Check for updates" button that queries the GitHub
+  Releases API, compares against the embedded version and shows a link
+  to the release page when a newer tag exists.
+- Diagnostics card opens the log folder, copies a diagnostics bundle to
+  the clipboard (with a non-async `execCommand` fallback for webview
+  environments that block `navigator.clipboard`), and toggles verbose
+  logging at runtime through `set_log_level`.
+
+#### Daemon connectivity
+- 1 Hz Rust poller connects to the daemon over the named pipe, emits
+  `telemetry` and `connection-status` events to the webview, and
+  reconnects with a 2 s back-off (interruptible by a `Notify` signal so
+  the "Retry now" button is instant).
+- Modal `DaemonOverlay` when the connection is anything other than
+  `connected`. Explains the situation, lists `sc query` / `sc start`
+  commands, and offers a Retry button.
+
+#### Diagnostics & logging
+- `tracing-subscriber` with both stdout and a daily-rotating file
+  appender under `%LOCALAPPDATA%\Lecoo Control Center\logs\`.
+- `EnvFilter` sits behind a `reload::Handle` so verbose logging can be
+  flipped at runtime without restarting.
+- `get_diagnostics_bundle` Tauri command produces a copy-paste-ready
+  markdown block with the GUI version, OS info, daemon state, the last
+  connection error and the tail of today's log.
+- React `ErrorBoundary` wraps the whole app: on a render-time crash the
+  user gets the stack trace and a retry button instead of a blank
+  WebView2.
+
+### Build & release
+
+- WiX MSI installer (`gui/wix/daemon-service.wxs`) ships
+  `lecoo-ec-daemon.exe`, `inpoutx64.dll` and the GUI, then registers
+  `LecooControlDaemon` as a LocalSystem auto-start service. The service
+  starts on install, and stops + unregisters on uninstall, so MSI repair
+  and upgrade stay clean.
+- `pnpm tauri build` produces a single `.msi` — the daemon is built in
+  release as a `beforeBundleCommand` step.
+- `.github/workflows/release.yml`: tag-triggered (`v*.*.*`) Windows build
+  that runs the unit tests, produces the MSI, attaches a SHA-256, and
+  publishes a GitHub Release with notes pulled from this file.
+- `.github/workflows/rust.yml`: CI on every push and PR. Workspace tests
+  run on Windows (full) and Linux (`--exclude gui`, because Tauri's
+  webview stack is Windows-only here). UI job runs `tsc --noEmit` and
+  `vitest`.
+- `branding/screenshots/` slot for the four screenshots referenced from
+  the README, with a small README in that folder describing what each
+  filename should show.
+- `scripts/make-icon.mjs`: turns the horizontal brand logo into a square
+  PNG so `pnpm tauri icon` can regenerate the full icon set whenever the
+  artwork changes.
+
+### Tests
+- Rust: the `gui` crate has 11 unit tests covering fan-curve
+  interpolation, EC duty-cycle mapping, update-version comparison and
+  the IPC handshake error path.
+- TypeScript: 11 vitest cases over the fan-curve editor helpers (sort,
+  clamp, coordinate mapping, interpolation mirroring the Rust side).
+
+### Known limitations
+
+- The MSI is not yet code-signed, so Windows SmartScreen will show a
+  "Microsoft Defender SmartScreen prevented an unrecognized app from
+  starting" prompt on first run. Click **More info → Run anyway**.
+- The fan curve is evaluated client-side (in the GUI) at 500 ms
+  intervals. If the GUI is closed the EC's auto profile takes over.
+  Server-side evaluation is the headline item in the next release.
+- Tauri's full updater (auto-download + replace) requires a signed
+  build, so the in-app updater currently points the user at the release
+  page rather than installing the new MSI directly.
 
 ## Upstream baseline
 
