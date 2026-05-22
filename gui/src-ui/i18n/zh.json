@@ -45,6 +45,50 @@
       "title": "电池"
     }
   },
+  "power": {
+    "title": "电源",
+    "subtitle": "EC 电源配置",
+    "profile_label": "配置",
+    "diagnostics": "诊断",
+    "applied_at": "应用时间",
+    "description": {
+      "silent": "最低风扇转速,较低 TDP — 安静办公。",
+      "default": "性能与静音的平衡。",
+      "performance": "解锁 TDP,风扇全速 — 游戏、编译、渲染。"
+    }
+  },
+  "battery": {
+    "title": "电池",
+    "subtitle": "FlexiCharger 充电限制",
+    "limit_label": "充电限制",
+    "limit": {
+      "FullCapacity": "满容量",
+      "HighCapacity": "高容量",
+      "Balanced": "均衡",
+      "MaximumLifespan": "最长寿命",
+      "DeskMode": "桌面模式"
+    },
+    "limit_desc": {
+      "FullCapacity": "充至 100%。续航最大,损耗最快。",
+      "HighCapacity": "充至 90–95%。轻度保护。",
+      "Balanced": "充至 70–80%。日常默认。",
+      "MaximumLifespan": "充至 55–60%。长期存放。",
+      "DeskMode": "充至 40–50%。常接电源。"
+    }
+  },
+  "keyboard": {
+    "title": "键盘",
+    "subtitle": "背光亮度",
+    "preset_label": "预设",
+    "custom_label": "自定义",
+    "preview_label": "预览",
+    "presets": {
+      "off": "关闭",
+      "low": "低",
+      "medium": "中",
+      "high": "高"
+    }
+  },
   "connection": {
     "disconnected": "未连接",
     "connecting": "连接中…",

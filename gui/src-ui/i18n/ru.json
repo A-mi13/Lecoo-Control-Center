@@ -45,6 +45,50 @@
       "title": "Батарея"
     }
   },
+  "power": {
+    "title": "Питание",
+    "subtitle": "Профиль EC",
+    "profile_label": "Профиль",
+    "diagnostics": "Диагностика",
+    "applied_at": "Применено",
+    "description": {
+      "silent": "Минимальные обороты, пониженный TDP — тихая офисная работа.",
+      "default": "Баланс производительности и тишины.",
+      "performance": "Разблокированный TDP, обороты выше — игры, компиляция, рендер."
+    }
+  },
+  "battery": {
+    "title": "Батарея",
+    "subtitle": "Лимиты FlexiCharger",
+    "limit_label": "Лимит заряда",
+    "limit": {
+      "FullCapacity": "Полная ёмкость",
+      "HighCapacity": "Высокая ёмкость",
+      "Balanced": "Баланс",
+      "MaximumLifespan": "Максимальный ресурс",
+      "DeskMode": "Стационарный режим"
+    },
+    "limit_desc": {
+      "FullCapacity": "Заряд до 100%. Максимум, быстрее износ.",
+      "HighCapacity": "Заряд до 90–95%. Лёгкая защита.",
+      "Balanced": "Заряд до 70–80%. По умолчанию для повседневки.",
+      "MaximumLifespan": "Заряд до 55–60%. Долгое хранение.",
+      "DeskMode": "Заряд до 40–50%. Всегда от сети."
+    }
+  },
+  "keyboard": {
+    "title": "Клавиатура",
+    "subtitle": "Яркость подсветки",
+    "preset_label": "Пресет",
+    "custom_label": "Произвольно",
+    "preview_label": "Предпросмотр",
+    "presets": {
+      "off": "Выкл",
+      "low": "Низкая",
+      "medium": "Средняя",
+      "high": "Высокая"
+    }
+  },
   "connection": {
     "disconnected": "Нет связи",
     "connecting": "Соединение…",

@@ -45,3 +45,40 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
+
+.lc-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: 14px;
+}
+
+.lc-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    var(--color-accent) 0%,
+    var(--color-accent) calc(var(--lc-slider-pct, 0) * 1%),
+    var(--color-border) calc(var(--lc-slider-pct, 0) * 1%),
+    var(--color-border) 100%
+  );
+}
+
+.lc-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--color-bg-elev);
+  border: 2px solid var(--color-accent);
+  box-shadow: 0 0 6px var(--color-accent);
+  cursor: pointer;
+}
+
+.lc-slider:disabled::-webkit-slider-thumb {
+  cursor: not-allowed;
+  box-shadow: none;
+}

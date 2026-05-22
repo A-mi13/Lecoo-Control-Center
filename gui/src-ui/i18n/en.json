@@ -45,6 +45,50 @@
       "title": "Battery"
     }
   },
+  "power": {
+    "title": "Power",
+    "subtitle": "EC power profile",
+    "profile_label": "Profile",
+    "diagnostics": "Diagnostics",
+    "applied_at": "Applied at",
+    "description": {
+      "silent": "Lowest fans, lower TDP — quiet office work.",
+      "default": "Balanced performance and quietness.",
+      "performance": "Unlocked TDP, fans ramp up — gaming, compile, render."
+    }
+  },
+  "battery": {
+    "title": "Battery",
+    "subtitle": "FlexiCharger limits",
+    "limit_label": "Charge limit",
+    "limit": {
+      "FullCapacity": "Full capacity",
+      "HighCapacity": "High capacity",
+      "Balanced": "Balanced",
+      "MaximumLifespan": "Maximum lifespan",
+      "DeskMode": "Desk mode"
+    },
+    "limit_desc": {
+      "FullCapacity": "Charge to 100%. Best range, fastest wear.",
+      "HighCapacity": "Charge to 90–95%. Light protection.",
+      "Balanced": "Charge to 70–80%. Default for daily use.",
+      "MaximumLifespan": "Charge to 55–60%. Long-term storage.",
+      "DeskMode": "Charge to 40–50%. Always plugged in."
+    }
+  },
+  "keyboard": {
+    "title": "Keyboard",
+    "subtitle": "Backlight brightness",
+    "preset_label": "Preset",
+    "custom_label": "Custom",
+    "preview_label": "Preview",
+    "presets": {
+      "off": "Off",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    }
+  },
   "connection": {
     "disconnected": "Disconnected",
     "connecting": "Connecting…",
