@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{AppHandle, Emitter, Manager, async_runtime};
 
 use crate::ipc_client::IpcClient;
 use crate::state::{AppState, ConnectionStatus};
@@ -10,7 +10,7 @@ const POLL_INTERVAL_MS: u64 = 1000;
 const RECONNECT_DELAY_MS: u64 = 2000;
 
 pub fn start(app: AppHandle) {
-    tokio::spawn(async move {
+    async_runtime::spawn(async move {
         run(app).await;
     });
 }
