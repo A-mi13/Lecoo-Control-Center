@@ -93,6 +93,13 @@ fn bring_window_to_front(app: &AppHandle) {
         let _ = w.unminimize();
         let _ = w.set_focus();
     }
+    // Resume telemetry polling now that someone is looking at the UI.
+    if let Some(state) = app.try_state::<std::sync::Arc<crate::state::AppState>>() {
+        state
+            .poll_paused
+            .store(false, std::sync::atomic::Ordering::Relaxed);
+        state.reconnect_signal.notify_one();
+    }
 }
 
 /// Update the tray icon's tooltip to reflect the latest telemetry sample.

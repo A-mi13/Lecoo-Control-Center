@@ -89,22 +89,20 @@
   },
   "fans": {
     "title": "Fans",
-    "subtitle": "Per-fan curve over EC temperature",
+    "subtitle": "EC-managed cooling",
     "live_temp": "Live temperature",
     "live_rpm": "Live RPM",
-    "predicted_pwm": "Curve target",
-    "curve_title": "Curve",
-    "presets": "Presets",
+    "mode_title": "Fan mode",
     "mode": {
       "auto": "Auto",
-      "curve": "Curve",
       "full": "Full"
     },
-    "preset": {
-      "silent": "Silent",
-      "balanced": "Balanced",
-      "aggressive": "Aggressive"
-    }
+    "description": {
+      "auto": "The Embedded Controller picks fan speeds from its built-in thermal table based on the active power profile.",
+      "full": "Override the table — both fans run at 100%. Use it sparingly; the EC will hold this until you switch back to Auto."
+    },
+    "curve_disabled_title": "Custom fan curves",
+    "curve_disabled_body": "Custom curves were removed in 0.1.2-beta. Evaluating a curve client-side meant the GUI had to poke the EC every few hundred milliseconds, which on these boards triggers SMIs (DPC latency, audio glitches, FPS drops). A server-side implementation belongs in the upstream daemon, not in the GUI — until then the EC's built-in thermal tables (Auto) are the right answer."
   },
   "power": {
     "title": "Power",

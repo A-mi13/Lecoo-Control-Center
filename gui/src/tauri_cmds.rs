@@ -7,8 +7,6 @@ use ipc::{
 use serde::Deserialize;
 use tauri::State;
 
-use crate::curve::FanCurve;
-use crate::curve_runner::{CurveRunner, FanCurveState};
 use tauri_plugin_autostart::ManagerExt;
 
 use crate::diagnostics;
@@ -286,34 +284,25 @@ pub fn restore_defaults() -> Result<(), String> {
     send_one(IpcRequest::DaemonCommand(DaemonCommand::RestoreDefaults))
 }
 
-// ---------- Fan curve ----------
-
-#[tauri::command]
-pub fn get_fan_curve(fan: FanArg, runner: State<'_, Arc<CurveRunner>>) -> FanCurveState {
-    match fan {
-        FanArg::Cpu => runner.cpu.read().clone(),
-        FanArg::Gpu => runner.gpu.read().clone(),
-    }
-}
-
-#[tauri::command]
-pub fn set_fan_curve(
-    fan: FanArg,
-    curve: FanCurve,
-    runner: State<'_, Arc<CurveRunner>>,
-) -> Result<(), String> {
-    let slot = match fan {
-        FanArg::Cpu => &runner.cpu,
-        FanArg::Gpu => &runner.gpu,
-    };
-    let mut st = slot.write();
-    st.curve = Some(curve);
-    Ok(())
-}
-
 #[tauri::command]
 pub fn reconnect_now(state: State<'_, Arc<AppState>>) {
     state.reconnect_signal.notify_one();
+}
+
+/// Tell the Rust poller whether the main window is visible. Hidden →
+/// `paused = true` and the poller stops issuing IPC requests until the
+/// window is shown again. Cuts background EC traffic to zero while the
+/// app sits in the tray.
+#[tauri::command]
+pub fn set_poll_paused(paused: bool, state: State<'_, Arc<AppState>>) {
+    state
+        .poll_paused
+        .store(paused, std::sync::atomic::Ordering::Relaxed);
+    if !paused {
+        // Resume: wake the poller out of its parked sleep so the user sees
+        // a fresh sample immediately instead of waiting up to PAUSED_CHECK_MS.
+        state.reconnect_signal.notify_one();
+    }
 }
 
 #[tauri::command]
@@ -387,29 +376,3 @@ fn open_in_explorer(path: &std::path::Path) -> std::io::Result<()> {
         .map(|_| ())
 }
 
-#[tauri::command]
-pub fn set_fan_curve_enabled(
-    fan: FanArg,
-    enabled: bool,
-    runner: State<'_, Arc<CurveRunner>>,
-) -> Result<(), String> {
-    let slot = match fan {
-        FanArg::Cpu => &runner.cpu,
-        FanArg::Gpu => &runner.gpu,
-    };
-    {
-        let mut st = slot.write();
-        st.enabled = enabled;
-    }
-    // When the user turns the curve off, hand control back to EC's auto policy.
-    if !enabled {
-        let _ = send_one(IpcRequest::SetFanMode {
-            fan: match fan {
-                FanArg::Cpu => FanIndex::Cpu,
-                FanArg::Gpu => FanIndex::Gpu,
-            },
-            mode: FanMode::Auto,
-        });
-    }
-    Ok(())
-}

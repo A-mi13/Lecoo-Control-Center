@@ -89,22 +89,20 @@
   },
   "fans": {
     "title": "风扇",
-    "subtitle": "基于 EC 温度的每风扇曲线",
+    "subtitle": "由 EC 管理的散热",
     "live_temp": "实时温度",
     "live_rpm": "实时转速",
-    "predicted_pwm": "曲线目标",
-    "curve_title": "曲线",
-    "presets": "预设",
+    "mode_title": "风扇模式",
     "mode": {
       "auto": "自动",
-      "curve": "曲线",
       "full": "全速"
     },
-    "preset": {
-      "silent": "静音",
-      "balanced": "均衡",
-      "aggressive": "激进"
-    }
+    "description": {
+      "auto": "EC 根据激活的电源配置,按内置温控表自动设定风扇转速。",
+      "full": "覆盖温控表——两个风扇都全速运转。请谨慎使用,EC 会一直保持该状态,直到切换回 Auto。"
+    },
+    "curve_disabled_title": "自定义风扇曲线",
+    "curve_disabled_body": "自定义曲线已在 0.1.2-beta 移除。客户端评估曲线意味着 GUI 每数百毫秒就要访问一次 EC,而这些主板会因此触发 SMI(DPC 延迟、声音卡顿、游戏掉帧)。服务端实现属于上游守护进程,在此之前正确做法是使用 EC 自带的温控表(自动模式)。"
   },
   "power": {
     "title": "电源",

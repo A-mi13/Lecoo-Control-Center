@@ -1,6 +1,6 @@
 // #![windows_subsystem = "windows"]
 
-use anyhow::{Result, Context};
+use anyhow::Result;
 use ipc::{ChargeLimit, CurrentSettings, IpcConnection, IpcRequest, IpcServer};
 use log::info;
 use std::{sync::{Mutex, OnceLock}, thread};
@@ -171,6 +171,33 @@ fn main() -> Result<()> {
 
     let _ = EC.set(ec);
     let _ = STATE.set(Mutex::new(daemon_state));
+
+    // EC lock watchdog. On these boards a stuck port-I/O can sit on the
+    // mutex for seconds; once we notice that, log loudly so users can
+    // attach the line to their issue reports. Best-effort, no recovery
+    // here yet — the lock will release on its own when the SMI finishes
+    // or the daemon is restarted.
+    thread::Builder::new()
+        .name("ec-lock-watchdog".into())
+        .spawn(|| {
+            let mut last_warned_ms = 0u64;
+            loop {
+                std::thread::sleep(std::time::Duration::from_secs(1));
+                let Some(ec) = EC.get() else { continue; };
+                let age = ec.lock_age_ms();
+                if age > 2000 && age != last_warned_ms {
+                    log::warn!(
+                        "EC I/O lock held for {} ms — possible SMI stall or wedged batch",
+                        age
+                    );
+                    last_warned_ms = age;
+                }
+                if age == 0 {
+                    last_warned_ms = 0;
+                }
+            }
+        })
+        .expect("failed to spawn ec-lock-watchdog");
 
     #[cfg(target_os="linux")]
     println!("Daemon started. For reading logs: \"journalctl -t lecoo-daemon -f\"");

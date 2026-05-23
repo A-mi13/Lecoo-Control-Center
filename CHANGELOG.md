@@ -7,6 +7,54 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 (nothing yet — the next entry will land here.)
 
+## [0.1.2-beta] - 2026-05-23
+
+Acting on community feedback ([upstream maintainer's tech write-up on
+SMI behaviour][smi-thread]): the GUI no longer evaluates fan curves
+client-side, and it pesters the EC noticeably less often.
+
+[smi-thread]: https://4pda.to/forum/index.php?showtopic=1115067 (Lenovo Lecoo Pro 14 thread on 4pda)
+
+### Removed
+- **Custom fan curves removed from the Fans page.** Evaluating a curve
+  in the GUI meant polling the EC every 500 ms and writing back a PWM
+  value, which on these boards triggers SMIs (System Management
+  Interrupts) — those briefly pause the entire CPU and show up as DPC
+  latency, audio glitches and FPS drops. A correct implementation has
+  to live in the daemon (with hysteresis and a failsafe-on-crash), and
+  that's upstream's call to make. Until then the Fan page exposes only
+  the EC's two modes: **Auto** (the built-in thermal table, respects
+  the active power profile) and **Full** (both fans at 100%).
+- `gui/src/curve.rs`, `gui/src/curve_runner.rs`, the SVG fan-curve
+  editor, the Silent/Balanced/Aggressive presets, and the
+  `get_fan_curve` / `set_fan_curve` / `set_fan_curve_enabled` Tauri
+  commands are all gone. The remaining `set_fan_mode` command stays
+  the same.
+
+### Changed
+- **Telemetry poll rate lowered from 1 Hz to 0.33 Hz** (one sample
+  every 3 s). That's still smooth enough for a chart someone is
+  looking at, and it cuts our EC port-I/O traffic to a third.
+- **The poller now parks while the window is hidden.** When the user
+  closes the window to tray, `set_poll_paused(true)` stops further
+  IPC round-trips entirely; the connection stays open so resumes are
+  instant. Re-opening the window from the tray re-arms polling and
+  pulls a fresh sample immediately.
+
+### Daemon (fork-only changes)
+- **EC port probing now retries up to 5 times with a 400 ms back-off.**
+  On Windows 11 25H2 the Service Control Manager started releasing
+  services slightly before the EC finishes its own power-on init, so
+  the first probe could read `0xFF` on every port and the daemon would
+  bail. Adding a short retry loop is enough to ride out that race
+  without slowing the happy path (first probe almost always succeeds).
+- **EC I/O lock has a watchdog.** A background thread polls
+  `EcDevice::lock_age_ms` once a second and writes a `WARN`-level log
+  line when a single batch holds the mutex past 2 s — usually a stuck
+  SMI or a wedged super-I/O transaction. Each `with_batch` call also
+  logs at WARN when its own elapsed time crosses 500 ms, so we get a
+  trail in the diagnostics bundle even on milder slowdowns.
+
 ## [0.1.1-beta] - 2026-05-23
 
 Patch release with the first batch of feedback fixes after `0.1.0-beta`.

@@ -1,4 +1,5 @@
 use parking_lot::RwLock;
+use std::sync::atomic::AtomicBool;
 use tokio::sync::Notify;
 
 #[derive(Clone, Debug, serde::Serialize, Default)]
@@ -34,8 +35,14 @@ pub struct AppState {
     pub last_telemetry: RwLock<Option<Telemetry>>,
     pub connection: RwLock<ConnectionStatus>,
     pub last_connection_error: RwLock<Option<String>>,
-    /// Notify the poller to skip its reconnect delay (user clicked "Retry now").
+    /// Notify the poller to skip its reconnect delay (user clicked "Retry
+    /// now") or to wake up immediately after a paused interval.
     pub reconnect_signal: Notify,
+    /// When true, the poller stops issuing IPC requests. Set by the GUI when
+    /// the main window is hidden (close-to-tray) so we stop bothering the EC
+    /// for a UI nobody is looking at — each EC read is a slow port-I/O call
+    /// that can trigger an SMI.
+    pub poll_paused: AtomicBool,
 }
 
 impl AppState {
@@ -45,6 +52,7 @@ impl AppState {
             connection: RwLock::new(ConnectionStatus::Disconnected),
             last_connection_error: RwLock::new(None),
             reconnect_signal: Notify::new(),
+            poll_paused: AtomicBool::new(false),
         }
     }
 }

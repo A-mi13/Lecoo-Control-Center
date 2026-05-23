@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use std::sync::atomic::Ordering;
 use std::time::Duration;
 
 use tauri::{AppHandle, Emitter, Manager, async_runtime};
@@ -7,8 +8,17 @@ use crate::ipc_client::IpcClient;
 use crate::state::{AppState, ConnectionStatus};
 use crate::tray;
 
-const POLL_INTERVAL_MS: u64 = 1000;
+/// How often we ask the daemon for a fresh telemetry sample. Every IPC call
+/// becomes an EC port-I/O round-trip in the daemon, and on most Lenovo /
+/// Lecoo boards those can fire SMIs that briefly stall the OS. Once every
+/// three seconds is plenty for a UI that humans look at, and it cuts EC
+/// traffic to a third of the original Phase 1 default.
+const POLL_INTERVAL_MS: u64 = 3000;
 const RECONNECT_DELAY_MS: u64 = 2000;
+/// When the window is hidden we keep the connection alive but skip
+/// telemetry round-trips entirely. This is the upper bound on how long we
+/// stay parked before re-checking the pause flag.
+const PAUSED_CHECK_MS: u64 = 5000;
 
 pub fn start(app: AppHandle) {
     async_runtime::spawn(async move {
@@ -44,6 +54,16 @@ async fn run(app: AppHandle) {
         };
 
         loop {
+            if state.poll_paused.load(Ordering::Relaxed) {
+                // Window is hidden — sit on the connection and wait. A wake
+                // signal (resume/show) will pop us out early.
+                tokio::select! {
+                    _ = tokio::time::sleep(Duration::from_millis(PAUSED_CHECK_MS)) => {}
+                    _ = state.reconnect_signal.notified() => {}
+                }
+                continue;
+            }
+
             match client.fetch_telemetry() {
                 Ok(t) => {
                     *state.last_telemetry.write() = Some(t.clone());
@@ -57,7 +77,11 @@ async fn run(app: AppHandle) {
                     break;
                 }
             }
-            tokio::time::sleep(Duration::from_millis(POLL_INTERVAL_MS)).await;
+
+            tokio::select! {
+                _ = tokio::time::sleep(Duration::from_millis(POLL_INTERVAL_MS)) => {}
+                _ = state.reconnect_signal.notified() => {}
+            }
         }
     }
 }

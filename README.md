@@ -4,7 +4,7 @@
 <h1>Lecoo Control Center</h1>
 
 <p>
-A desktop control center for Lecoo / Emdoor laptops — live telemetry, per-fan curves, power profiles, battery limits, keyboard backlight and rear LED ring control, all driven by a Windows service that talks to the laptop's Embedded Controller.
+A desktop control center for Lecoo / Emdoor laptops — live telemetry, EC fan modes, power profiles, battery limits, keyboard backlight and rear LED ring control, all driven by a Windows service that talks to the laptop's Embedded Controller.
 </p>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -23,23 +23,23 @@ This repository is a fork of [LaVashikk/Lecoo-Control-Center](https://github.com
 
 This fork adds and changes the following:
 
-- **Tauri 2 + React desktop GUI** — a full control surface for monitoring and configuration: live temperature/RPM tiles, a uPlot temperature chart with selectable time ranges, an SVG fan-curve editor with drag-to-edit points and presets, power-profile and FlexiCharger limits, keyboard backlight with a live key preview, an LED-ring animation builder, custom titlebar with live connection status, system tray with quick profile/fan submenus, autostart, light/dark/auto themes, and English/Russian/Chinese localisation. *(this is the main reason this fork exists.)*
+- **Tauri 2 + React desktop GUI** — a full control surface for monitoring and configuration: live temperature/RPM tiles, a uPlot temperature chart with selectable time ranges, EC fan-mode switching (Auto / Full), power-profile and FlexiCharger limits, keyboard backlight with a live key preview, an LED-ring animation builder, Windows-style titlebar with live connection status, system tray with quick profile/fan submenus, autostart, light/dark/auto themes, and English/Russian/Chinese localisation. *(this is the main reason this fork exists.)*
 - **MSI installer that registers the daemon as a Windows Service** — one `Lecoo Control Center_*.msi` installs the GUI, the daemon, and `inpoutx64.dll`, then registers `LecooControlDaemon` as a LocalSystem auto-start service. After install the GUI opens like any normal program — no UAC prompts, no manual `cargo run --release` from an Administrator shell.
 - **In-app diagnostics for bug reports** — Settings → Diagnostics → Copy diagnostics packages the GUI version, OS info, last daemon error, and a tail of the rotating log into a markdown block that can be pasted straight into a GitHub issue. Verbose logging can be toggled from the same screen.
-- **Daemon improvements (planned in this fork)** — server-side fan curve evaluation, resume-from-sleep state restore, Windows 11 25H2 service-start fix, and an EC I/O lock-contention guard. These land alongside the GUI work and are tracked in [CHANGELOG.md](CHANGELOG.md).
+- **Daemon improvements (planned in this fork)** — resume-from-sleep state restore, Windows 11 25H2 service-start fix, and an EC I/O lock-contention guard. Server-side fan curve evaluation is intentionally **not** part of this fork — it belongs in the upstream daemon (see *Known limitations*). All progress is tracked in [CHANGELOG.md](CHANGELOG.md).
 
 Everything else — EC HRAM probing, PWM control, FlexiCharger thresholds, LED ring animations, the IPC protocol on the wire — comes straight from upstream.
 
 ## Status
 
-The GUI is in **beta**. All seven feature phases (shell, telemetry, dashboard, power/battery/keyboard, fan curves, LED ring, settings + tray) are implemented and build into a working MSI on Windows. The remaining work before a tagged v1.0 release is the daemon-side improvements listed above and a signed release pipeline.
+The GUI is in **beta**. The full feature set (shell, telemetry, dashboard, EC fan modes, power/battery/keyboard, LED ring, settings + tray, diagnostics) is implemented and builds into a working MSI on Windows. The remaining work before a tagged v1.0 release is the daemon-side improvements listed above, a signed release pipeline, and waiting on a proper server-side fan-curve implementation in upstream.
 
 ## Screenshots
 
 <table>
   <tr>
     <td align="center"><img src="branding/screenshots/overview.png" alt="Overview dashboard" width="420"><br><sub>Overview · live telemetry</sub></td>
-    <td align="center"><img src="branding/screenshots/fans.png" alt="Fan curve editor" width="420"><br><sub>Fans · curve editor</sub></td>
+    <td align="center"><img src="branding/screenshots/fans.png" alt="Fans page" width="420"><br><sub>Fans · Auto / Full mode</sub></td>
   </tr>
   <tr>
     <td align="center"><img src="branding/screenshots/power.png" alt="Power profiles" width="420"><br><sub>Power · profile + diagnostics</sub></td>
@@ -57,7 +57,7 @@ The GUI is in **beta**. All seven feature phases (shell, telemetry, dashboard, p
 ## Features
 
 - ✨ **Live telemetry** — CPU and system temperatures, CPU and GPU fan RPM, refreshed once a second over the daemon's IPC channel. Bounded history (up to 30 minutes) feeds a temperature chart with 30 s / 60 s / 5 m / 30 m range pills and four stat tiles with inline sparklines.
-- 🌡️ **Fan curves** — interactive SVG editor for the CPU and GPU fans. Drag points to move them, double-click to add, right-click to remove. The live temperature rides the curve so you can see what duty cycle a given thermal point will produce. Three starting presets (Silent / Balanced / Aggressive). Curves are evaluated continuously by a 500 ms client-side runner today; server-side evaluation is part of the planned daemon work.
+- 🌡️ **Fan modes** — Auto (the EC's built-in thermal table, respects the active power profile) and Full (override both fans to 100%). Custom curves are intentionally not exposed by the GUI; see *Known limitations* below.
 - ⚡ **Power profiles** — one-click Silent / Default / Performance switching from the dashboard, the Power page, and the system tray. The active profile rides the tray icon's submenu.
 - 🔋 **Battery limits (FlexiCharger)** — Full / High / Balanced / Maximum Lifespan / Desk Mode, with each option labelled by its real percentage range and a one-line rationale.
 - ⌨️ **Keyboard backlight** — Off / Low / Medium / High presets and a 0–255 custom slider. A 3-row mini-keyboard preview lights up in real time so you can see the level before committing.
@@ -130,6 +130,13 @@ If something misbehaves, the easiest way to file a useful issue is from inside t
 If the bug is subtle ("works most of the time"), toggle **Verbose logging** on, reproduce the problem, then Copy diagnostics again — the bundle will include `debug`-level traces. The "Open log folder" button next to it opens `%LOCALAPPDATA%\Lecoo Control Center\logs\`, where daily-rotated log files live.
 
 Bugs that clearly come from the daemon / CLI / EC layer are also welcome upstream at <https://github.com/LaVashikk/Lecoo-Control-Center/issues> — they get more eyes there, and improvements made here are sent back upstream when they apply.
+
+## Known limitations
+
+- **The MSI is not yet code-signed.** Windows SmartScreen will warn about an "unrecognized app" on first run — click *More info → Run anyway*. We'll sign once the GUI hits a tagged release.
+- **No custom fan curves in this GUI.** A curve evaluated client-side (as in `0.1.0` / `0.1.1`) means polling and writing the EC several times per second. On these boards EC port-I/O frequently triggers System Management Interrupts, which briefly stall the whole CPU and surface as DPC latency, audio glitches and FPS drops. A correct implementation needs hysteresis, a failsafe path if the daemon crashes mid-curve, and per-board tuning — that's upstream's call to make, and we'll wire the GUI to it once it ships. Meanwhile the EC's built-in thermal table (Auto mode) is the right answer.
+- **The in-app updater only points at the release page**, it doesn't download or install the new MSI for you. Tauri's full updater requires a signed build, so it stays unwired until signing happens.
+- **Telemetry is polled at 0.33 Hz** (one sample every 3 s) and pauses entirely when the window is hidden to keep EC port-I/O traffic low.
 
 ## Architecture
 

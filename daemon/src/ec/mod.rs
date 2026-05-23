@@ -1,5 +1,7 @@
 use anyhow::{bail, Result};
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicU64, Ordering};
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 #[cfg(target_os = "linux")]
 mod sys_linux;
@@ -26,6 +28,12 @@ pub struct EcDevice {
     port: u16,
     pub offsets: EcOffsets,
     pub hram_offset: u16,
+    /// Wall-clock time (millis since UNIX epoch) when the I/O lock was last
+    /// taken, or 0 when it's free. The watchdog thread reads this to detect
+    /// hangs where someone is sitting on the lock for far too long (EC port
+    /// transactions usually finish in micros, anything past a second means
+    /// either a stuck SMI or a wedged batch).
+    lock_held_since_ms: AtomicU64,
 }
 
 impl EcDevice {
@@ -57,10 +65,39 @@ impl EcDevice {
             io: Mutex::new(io),
             port: 0,
             offsets,
-            hram_offset: 0xFF
+            hram_offset: 0xFF,
+            lock_held_since_ms: AtomicU64::new(0),
         };
 
-        device.probe_chip(insecure_mode)?;
+        // On Windows 11 25H2 SCM started releasing services slightly before
+        // the EC finishes its own power-on init, so the very first probe
+        // can return ID 0xFF on every port. A short retry loop turns that
+        // race into a non-issue without changing the happy-path latency
+        // (first attempt almost always succeeds).
+        const PROBE_ATTEMPTS: usize = 5;
+        const PROBE_BACKOFF_MS: u64 = 400;
+        let mut last_err = None;
+        for attempt in 0..PROBE_ATTEMPTS {
+            match device.probe_chip(insecure_mode) {
+                Ok(()) => break,
+                Err(e) => {
+                    if attempt + 1 == PROBE_ATTEMPTS {
+                        last_err = Some(e);
+                        break;
+                    }
+                    log::warn!(
+                        "EC probe attempt {}/{} failed ({e}); retrying in {} ms",
+                        attempt + 1,
+                        PROBE_ATTEMPTS,
+                        PROBE_BACKOFF_MS
+                    );
+                    std::thread::sleep(std::time::Duration::from_millis(PROBE_BACKOFF_MS));
+                }
+            }
+        }
+        if let Some(e) = last_err {
+            return Err(e);
+        }
 
         let possible_bases: [u16; 5] = [0xC400, 0xC000, 0x0400, 0x0000, 0xE000];
         for &base in &possible_bases {
@@ -123,6 +160,18 @@ impl EcDevice {
     {
         let guard = self.io.lock().unwrap();
 
+        // Mark the lock as held so the watchdog can spot batches that
+        // overstay their welcome (e.g. EC stuck in an SMI).
+        let now_ms = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_millis() as u64)
+            .unwrap_or(0);
+        self.lock_held_since_ms.store(now_ms, Ordering::Relaxed);
+        let _release_guard = LockTimer {
+            held: &self.lock_held_since_ms,
+            taken_at: Instant::now(),
+        };
+
         let batch = EcBatch {
             io: guard,
             port: self.port,
@@ -131,6 +180,21 @@ impl EcDevice {
         };
 
         f(&batch)
+    }
+
+    /// Returns the wall-clock millisecond timestamp when the lock was taken,
+    /// or 0 when it's currently free. Used by the watchdog thread to flag
+    /// abnormally long EC transactions.
+    pub fn lock_age_ms(&self) -> u64 {
+        let since = self.lock_held_since_ms.load(Ordering::Relaxed);
+        if since == 0 {
+            return 0;
+        }
+        let now_ms = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_millis() as u64)
+            .unwrap_or(since);
+        now_ms.saturating_sub(since)
     }
 
     // --- High-Level Facades ---
@@ -221,5 +285,25 @@ impl<'a> EcBatch<'a> {
     /// Writes a single byte to the HRAM window using the detected offset.
     pub fn write_ram(&self, offset: u16, val: u8) -> Result<()> {
         self.write_reg(self.hram_offset + offset, val)
+    }
+}
+
+/// RAII helper: clears the held-since marker and logs slow batches when the
+/// `with_batch` closure returns (whether it succeeded or panicked).
+struct LockTimer<'a> {
+    held: &'a AtomicU64,
+    taken_at: Instant,
+}
+
+impl Drop for LockTimer<'_> {
+    fn drop(&mut self) {
+        let elapsed = self.taken_at.elapsed();
+        if elapsed.as_millis() > 500 {
+            log::warn!(
+                "EC batch held the I/O lock for {} ms — slow EC transaction",
+                elapsed.as_millis()
+            );
+        }
+        self.held.store(0, Ordering::Relaxed);
     }
 }
