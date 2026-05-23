@@ -305,6 +305,19 @@ pub fn set_poll_paused(paused: bool, state: State<'_, Arc<AppState>>) {
     }
 }
 
+/// Change how often the poller pulls a telemetry sample. Clamped to a
+/// sane range (>=500 ms, <=60 s) inside Rust so a malformed value from
+/// the webview can't accidentally turn the EC into a stress test.
+#[tauri::command]
+pub fn set_poll_interval(seconds: u32, state: State<'_, Arc<AppState>>) {
+    let ms = (seconds as u64 * 1000).clamp(500, 60_000);
+    state
+        .poll_interval_ms
+        .store(ms, std::sync::atomic::Ordering::Relaxed);
+    // Apply immediately by waking the current sleep.
+    state.reconnect_signal.notify_one();
+}
+
 #[tauri::command]
 pub async fn check_for_updates() -> Result<UpdateCheck, String> {
     tokio::task::spawn_blocking(updates::check_for_update)

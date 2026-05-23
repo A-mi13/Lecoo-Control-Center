@@ -43,6 +43,10 @@ pub struct AppState {
     /// for a UI nobody is looking at — each EC read is a slow port-I/O call
     /// that can trigger an SMI.
     pub poll_paused: AtomicBool,
+    /// How often the poller pulls a telemetry sample, in milliseconds.
+    /// Settable from the UI; the poller reads it after every tick so a
+    /// change takes effect within the previous interval.
+    pub poll_interval_ms: std::sync::atomic::AtomicU64,
 }
 
 impl AppState {
@@ -53,6 +57,7 @@ impl AppState {
             last_connection_error: RwLock::new(None),
             reconnect_signal: Notify::new(),
             poll_paused: AtomicBool::new(false),
+            poll_interval_ms: std::sync::atomic::AtomicU64::new(3000),
         }
     }
 }

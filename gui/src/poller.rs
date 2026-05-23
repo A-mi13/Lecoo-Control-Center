@@ -8,12 +8,12 @@ use crate::ipc_client::IpcClient;
 use crate::state::{AppState, ConnectionStatus};
 use crate::tray;
 
-/// How often we ask the daemon for a fresh telemetry sample. Every IPC call
-/// becomes an EC port-I/O round-trip in the daemon, and on most Lenovo /
-/// Lecoo boards those can fire SMIs that briefly stall the OS. Once every
-/// three seconds is plenty for a UI that humans look at, and it cuts EC
-/// traffic to a third of the original Phase 1 default.
-const POLL_INTERVAL_MS: u64 = 3000;
+/// Default interval between telemetry samples in milliseconds. The
+/// effective value lives in `AppState::poll_interval_ms` so the user can
+/// tune it from Settings — every IPC call becomes an EC port-I/O
+/// round-trip, and on most Lenovo / Lecoo boards those can fire SMIs.
+/// Three seconds is enough for a chart someone is looking at without
+/// bothering the EC pointlessly.
 const RECONNECT_DELAY_MS: u64 = 2000;
 /// When the window is hidden we keep the connection alive but skip
 /// telemetry round-trips entirely. This is the upper bound on how long we
@@ -78,8 +78,9 @@ async fn run(app: AppHandle) {
                 }
             }
 
+            let interval_ms = state.poll_interval_ms.load(Ordering::Relaxed).max(500);
             tokio::select! {
-                _ = tokio::time::sleep(Duration::from_millis(POLL_INTERVAL_MS)) => {}
+                _ = tokio::time::sleep(Duration::from_millis(interval_ms)) => {}
                 _ = state.reconnect_signal.notified() => {}
             }
         }

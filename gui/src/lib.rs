@@ -41,6 +41,7 @@ pub fn run() {
             tauri_cmds::get_autostart,
             tauri_cmds::reconnect_now,
             tauri_cmds::set_poll_paused,
+            tauri_cmds::set_poll_interval,
             tauri_cmds::check_for_updates,
         ])
         .setup(move |app| {

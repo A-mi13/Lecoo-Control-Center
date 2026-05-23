@@ -28,12 +28,24 @@ export function DaemonOverlay() {
 
   if (status.kind === 'connected') return null;
 
-  const title =
-    status.kind === 'error'
+  // The daemon's handshake returns "Version mismatch!..." when its
+  // protocol major doesn't match ours; surface that as its own title so
+  // the user understands they need to update one or the other rather
+  // than thinking the service is broken.
+  const isMismatch =
+    status.kind === 'error' && /mismatch/i.test(status.message);
+
+  const title = isMismatch
+    ? t('daemon_overlay.mismatch_title')
+    : status.kind === 'error'
       ? t('daemon_overlay.error_title')
       : status.kind === 'connecting'
         ? t('daemon_overlay.connecting_title')
         : t('daemon_overlay.disconnected_title');
+
+  const body = isMismatch
+    ? t('daemon_overlay.mismatch_body')
+    : t('daemon_overlay.body');
 
   const detail = status.kind === 'error' ? status.message : null;
 
@@ -60,7 +72,7 @@ export function DaemonOverlay() {
           <h2 className="text-base font-semibold text-text-strong">{title}</h2>
         </div>
 
-        <p className="text-sm text-text mb-3">{t('daemon_overlay.body')}</p>
+        <p className="text-sm text-text mb-3">{body}</p>
 
         {detail ? (
           <pre className="text-[11px] font-mono bg-bg border border-border rounded p-2 mb-3 whitespace-pre-wrap break-all max-h-24 overflow-auto">

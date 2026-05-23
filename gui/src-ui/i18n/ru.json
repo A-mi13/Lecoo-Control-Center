@@ -152,7 +152,9 @@
     "disconnected_title": "Daemon не отвечает",
     "connecting_title": "Подключаемся к daemon'у…",
     "error_title": "Ошибка daemon'а",
+    "mismatch_title": "Несовместимая версия daemon'а",
     "body": "Lecoo Control Center работает через Windows-сервис, которому нужны права администратора для EC. Если сервис не установлен или остановлен, GUI работает только на чтение.",
+    "mismatch_body": "Установленный daemon говорит по другому протоколу IPC, чем этот GUI. Переустанови оба из одного MSI, чтобы версии совпали.",
     "retry": "Повторить"
   },
   "settings": {
@@ -177,13 +179,13 @@
       "verbose_logging": "Подробные логи"
     },
     "temp": { "celsius": "°C", "fahrenheit": "°F" },
-    "poll": { "1": "1с", "2": "2с", "5": "5с" },
+    "poll": { "3": "3с", "5": "5с", "10": "10с" },
     "history": { "5": "5 мин", "30": "30 мин", "120": "2 ч" },
     "daemon": {
       "status": "Статус",
       "version": "Версия",
       "gui_version": "Версия GUI",
-      "pipe": "IPC endpoint",
+      "pipe": "Канал IPC",
       "endpoint_value": "lecoo_ctl_daemon"
     },
     "updates": {

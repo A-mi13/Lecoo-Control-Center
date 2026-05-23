@@ -78,3 +78,7 @@ jobs:
       - name: Run vitest
         working-directory: gui
         run: pnpm test
+
+      - name: i18n coverage check
+        working-directory: gui
+        run: pnpm i18n:check

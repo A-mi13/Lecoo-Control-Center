@@ -7,6 +7,38 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 (nothing yet — the next entry will land here.)
 
+## [0.1.3-beta] - 2026-05-23
+
+Polish + acceptance pass. No headline features, just smaller fixes that
+follow from going through the whole UI screen by screen.
+
+### Added
+- **Telemetry poll interval is now actually wired.** The Settings
+  segment used to be cosmetic; it now drives the Rust poller through a
+  new `set_poll_interval` command. Choices are 3 s / 5 s / 10 s (1 s
+  was removed — too aggressive on the EC, see `0.1.2-beta`). Choice is
+  persisted and re-applied to the poller on every Settings mount.
+- **Daemon version mismatch gets its own overlay.** When the IPC
+  handshake rejects the GUI because of a protocol-major mismatch, the
+  `DaemonOverlay` now reads `Daemon version mismatch` with an explicit
+  "reinstall both from the same MSI" message instead of the generic
+  `Daemon error` title.
+- **`pnpm i18n:check` script** walks `en.json` / `ru.json` / `zh.json`,
+  prints missing keys, extra keys, and untranslated leaves. Wired into
+  the CI workflow so future translation drift fails the build instead
+  of shipping silently.
+
+### Fixed
+- One Russian string (`Канал IPC`) that had been left in English.
+
+### Build
+- NSIS installer was on the table for this release. After looking at it
+  we decided to stick with MSI only: Tauri's NSIS bundler doesn't know
+  about Windows services natively, and bolting `sc create / sc start`
+  through `NSIS_HOOK_POSTINSTALL` would introduce a second install path
+  to test for no real user benefit (the wizard UI is roughly the same
+  to a Windows user either way). Revisit if there is demand.
+
 ## [0.1.2-beta] - 2026-05-23
 
 Acting on community feedback ([upstream maintainer's tech write-up on

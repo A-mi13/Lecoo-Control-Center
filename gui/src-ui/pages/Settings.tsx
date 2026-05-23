@@ -79,6 +79,17 @@ export default function Settings() {
       .catch(() => {});
   }, []);
 
+  // Push the persisted poll interval into the Rust poller. The store
+  // remembers the user's choice across runs; without this push, the
+  // poller would always boot at its default until the user clicks the
+  // segment manually.
+  useEffect(() => {
+    invoke('set_poll_interval', { seconds: pollIntervalSec }).catch((e) =>
+      console.error('initial set_poll_interval failed', e),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Sync settings.language with whatever i18next actually resolved to.
   // Without this the UI can render Russian (because the browser detector
   // picked it) while the Settings segment still shows English from the
@@ -104,9 +115,13 @@ export default function Settings() {
     setSetting('tempUnit', u);
   }
 
-  function applyPoll(p: PollInterval) {
+  async function applyPoll(p: PollInterval) {
     setSetting('pollIntervalSec', p);
-    // Telemetry poll rate is owned by the Rust poller — wired in Phase 8.
+    try {
+      await invoke('set_poll_interval', { seconds: p });
+    } catch (e) {
+      console.error('set_poll_interval failed', e);
+    }
   }
 
   function applyHistory(h: HistoryWindow) {
@@ -239,9 +254,9 @@ export default function Settings() {
         <Row label={t('settings.field.poll_interval')}>
           <Segment
             options={[
-              { value: 1 as PollInterval, label: t('settings.poll.1') },
-              { value: 2 as PollInterval, label: t('settings.poll.2') },
+              { value: 3 as PollInterval, label: t('settings.poll.3') },
               { value: 5 as PollInterval, label: t('settings.poll.5') },
+              { value: 10 as PollInterval, label: t('settings.poll.10') },
             ]}
             value={pollIntervalSec}
             onChange={applyPoll}

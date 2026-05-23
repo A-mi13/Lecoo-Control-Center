@@ -152,7 +152,9 @@
     "disconnected_title": "无法连接守护进程",
     "connecting_title": "正在连接守护进程…",
     "error_title": "守护进程错误",
+    "mismatch_title": "守护进程版本不匹配",
     "body": "Lecoo 控制中心通过需要管理员权限的 Windows 服务与 EC 通信。如果服务未安装或已停止,GUI 仅可读。",
+    "mismatch_body": "已安装的守护进程使用的 IPC 协议版本与本 GUI 不同。请使用同一个 MSI 重新安装,以保持版本一致。",
     "retry": "立即重试"
   },
   "settings": {
@@ -177,7 +179,7 @@
       "verbose_logging": "详细日志"
     },
     "temp": { "celsius": "°C", "fahrenheit": "°F" },
-    "poll": { "1": "1秒", "2": "2秒", "5": "5秒" },
+    "poll": { "3": "3秒", "5": "5秒", "10": "10秒" },
     "history": { "5": "5分", "30": "30分", "120": "2小时" },
     "daemon": {
       "status": "状态",

@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 export type TempUnit = 'celsius' | 'fahrenheit';
 export type Language = 'en' | 'ru' | 'zh';
-export type PollInterval = 1 | 2 | 5;
+export type PollInterval = 3 | 5 | 10;
 export type HistoryWindow = 5 | 30 | 120;
 
 export interface Settings {
@@ -30,7 +30,7 @@ const DEFAULTS: Settings = {
   startMinimized: false,
   closeToTray: true,
   showTrayIcon: true,
-  pollIntervalSec: 2,
+  pollIntervalSec: 3,
   historyWindowMin: 30,
   autoCheckUpdates: true,
   verboseLogging: false,
