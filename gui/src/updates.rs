@@ -8,8 +8,13 @@
 
 use serde::{Deserialize, Serialize};
 
+// We list all releases instead of hitting /releases/latest, because the
+// "latest" endpoint hides anything flagged as prerelease — and during the
+// beta cycle every release is a prerelease, which would mean a permanent
+// 404 here. We pick the first release in the array (GitHub returns them
+// in published-at descending order).
 const GITHUB_API_URL: &str =
-    "https://api.github.com/repos/A-mi13/Lecoo-Control-Center/releases/latest";
+    "https://api.github.com/repos/A-mi13/Lecoo-Control-Center/releases?per_page=10";
 
 #[derive(Debug, Deserialize)]
 struct GhRelease {
@@ -40,7 +45,7 @@ pub fn check_for_update() -> Result<UpdateCheck, String> {
         " (+https://github.com/A-mi13/Lecoo-Control-Center)"
     );
 
-    let release: GhRelease = ureq::get(GITHUB_API_URL)
+    let releases: Vec<GhRelease> = ureq::get(GITHUB_API_URL)
         .header("User-Agent", user_agent)
         .header("Accept", "application/vnd.github+json")
         .call()
@@ -48,6 +53,11 @@ pub fn check_for_update() -> Result<UpdateCheck, String> {
         .body_mut()
         .read_json()
         .map_err(|e| e.to_string())?;
+
+    let release = releases
+        .into_iter()
+        .next()
+        .ok_or_else(|| "no releases published yet".to_string())?;
 
     let latest = release.tag_name.trim_start_matches('v').to_string();
     let current = env!("CARGO_PKG_VERSION").to_string();

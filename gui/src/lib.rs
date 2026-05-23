@@ -4,6 +4,7 @@ pub mod diagnostics;
 pub mod ipc_client;
 pub mod logging;
 pub mod poller;
+pub mod power_status;
 pub mod state;
 pub mod tauri_cmds;
 pub mod tray;

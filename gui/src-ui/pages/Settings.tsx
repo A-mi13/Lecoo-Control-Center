@@ -7,6 +7,7 @@ import { Card } from '@/components/Card';
 import { Segment } from '@/components/Segment';
 import { Toggle } from '@/components/Toggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useAppVersion } from '@/hooks/useAppVersion';
 import {
   useSettingsStore,
   type HistoryWindow,
@@ -28,11 +29,11 @@ type ConnectionStatus =
   | { kind: 'connected'; daemonVersion: [number, number] }
   | { kind: 'error'; message: string };
 
-const GUI_VERSION = '0.1.0';
 const REPO_URL = 'https://github.com/A-mi13/Lecoo-Control-Center';
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
+  const guiVersion = useAppVersion();
 
   // Subscribe to each setting individually so unrelated changes don't
   // rerender the whole page. Pulling the whole store with useSettingsStore()
@@ -277,7 +278,7 @@ export default function Settings() {
           label={t('settings.daemon.version')}
           value={formatDaemonVersion(status)}
         />
-        <DaemonRow label={t('settings.daemon.gui_version')} value={GUI_VERSION} />
+        <DaemonRow label={t('settings.daemon.gui_version')} value={guiVersion} />
         <DaemonRow
           label={t('settings.daemon.pipe')}
           value={t('settings.daemon.endpoint_value')}
@@ -325,7 +326,7 @@ export default function Settings() {
               {t('app.name')}
             </div>
             <div className="text-xs text-mute font-mono">
-              {GUI_VERSION} · {t('settings.about.license')}
+              {guiVersion} · {t('settings.about.license')}
             </div>
             <p className="text-sm text-text mt-1.5">{t('settings.about.tagline')}</p>
             <button

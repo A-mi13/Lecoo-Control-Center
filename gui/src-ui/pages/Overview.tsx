@@ -103,7 +103,14 @@ export default function Overview() {
           cpu={latest?.cpuFanRpm ?? 0}
           gpu={latest?.gpuFanRpm ?? 0}
         />
-        <BatteryCard title={t('overview.battery.title')} />
+        <BatteryCard
+          title={t('overview.battery.title')}
+          percent={latest?.batteryPercent ?? null}
+          limitMin={latest?.chargeLimitMin ?? 0}
+          limitMax={latest?.chargeLimitMax ?? 0}
+          acConnected={latest?.acConnected ?? null}
+          t={t}
+        />
       </div>
     </div>
   );
@@ -180,12 +187,83 @@ function FanBar({ label, rpm, pct }: { label: string; rpm: number; pct: number }
   );
 }
 
-function BatteryCard({ title }: { title: string }) {
-  // Wired to the daemon in Phase 4 (battery page).
+interface BatteryCardProps {
+  title: string;
+  percent: number | null;
+  limitMin: number;
+  limitMax: number;
+  acConnected: boolean | null;
+  t: (key: string) => string;
+}
+
+function BatteryCard({ title, percent, limitMin, limitMax, acConnected, t }: BatteryCardProps) {
+  const value = percent ?? 0;
+  // (0, 0) is what FlexiCharger reports for "Full capacity" — no limit set.
+  const hasLimit = limitMax > 0 && limitMax < 100;
+  const atLimit = hasLimit && value >= limitMax;
+  const charging = acConnected === true && !atLimit && value < 100;
+
+  const barColor = atLimit
+    ? 'from-ok to-accent'
+    : value <= 20
+      ? 'from-warn to-purple'
+      : 'from-accent to-purple';
+
+  const statusKey = charging
+    ? 'overview.battery.charging'
+    : atLimit
+      ? 'overview.battery.at_limit'
+      : acConnected === true
+        ? 'overview.battery.plugged'
+        : acConnected === false
+          ? 'overview.battery.on_battery'
+          : 'overview.battery.unknown';
+
   return (
     <div className="bg-bg-elev border border-border rounded-xl p-4 flex flex-col gap-3">
-      <span className="text-[11px] font-mono uppercase tracking-widest text-mute">{title}</span>
-      <div className="text-xs text-mute font-mono">wired in Phase 4</div>
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] font-mono uppercase tracking-widest text-mute">{title}</span>
+        {hasLimit ? (
+          <span className="text-[10px] font-mono text-mute">
+            {limitMin}–{limitMax}%
+          </span>
+        ) : null}
+      </div>
+
+      <div className="flex items-baseline gap-2">
+        <span className="text-3xl font-mono tabular-nums text-text-strong">
+          {percent != null ? value : '—'}
+        </span>
+        <span className="text-sm text-mute font-mono">%</span>
+        {charging ? (
+          <span
+            aria-hidden
+            title={t('overview.battery.charging')}
+            className="text-ok text-base leading-none ml-1"
+          >
+            ⚡
+          </span>
+        ) : null}
+      </div>
+
+      <div className="h-2 bg-bg rounded-full overflow-hidden border border-border relative">
+        <div
+          className={`h-full bg-gradient-to-r ${barColor} transition-[width] duration-500`}
+          style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+        />
+        {hasLimit ? (
+          <div
+            aria-hidden
+            className="absolute top-0 bottom-0 w-px bg-text-strong/40"
+            style={{ left: `${Math.min(100, limitMax)}%` }}
+            title={`${t('overview.battery.limit_mark')}: ${limitMax}%`}
+          />
+        ) : null}
+      </div>
+
+      <span className="text-[10px] font-mono text-mute">
+        {t(statusKey)}
+      </span>
     </div>
   );
 }

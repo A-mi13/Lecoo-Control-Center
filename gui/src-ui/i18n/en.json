@@ -42,7 +42,13 @@
       "title": "Fans"
     },
     "battery": {
-      "title": "Battery"
+      "title": "Battery",
+      "charging": "Charging",
+      "at_limit": "At charge limit",
+      "plugged": "Plugged in",
+      "on_battery": "On battery",
+      "unknown": "Power status unknown",
+      "limit_mark": "Limit"
     }
   },
   "led": {

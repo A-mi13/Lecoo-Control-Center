@@ -8,6 +8,16 @@ pub struct Telemetry {
     pub sys_temp_c: f32,
     pub cpu_fan_rpm: u32,
     pub gpu_fan_rpm: u32,
+    /// Battery state-of-charge in percent (0..=100).
+    pub battery_percent: u8,
+    /// Configured FlexiCharger limits: at battery_percent <= min the EC starts
+    /// charging, and at battery_percent >= max it stops. (0, 0) means "Full
+    /// capacity" (no limit).
+    pub charge_limit_min: u8,
+    pub charge_limit_max: u8,
+    /// AC adapter plugged in, as reported by Windows' GetSystemPowerStatus.
+    /// None means the GUI couldn't query the OS this tick.
+    pub ac_connected: Option<bool>,
     pub timestamp_ms: u64,
 }
 

@@ -5,6 +5,11 @@ export interface TelemetrySample {
   sysTempC: number;
   cpuFanRpm: number;
   gpuFanRpm: number;
+  batteryPercent: number;
+  chargeLimitMin: number;
+  chargeLimitMax: number;
+  /** null when Windows couldn't tell us — fall back to "unknown". */
+  acConnected: boolean | null;
   timestampMs: number;
 }
 

@@ -7,6 +7,42 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 (nothing yet — the next entry will land here.)
 
+## [0.1.1-beta] - 2026-05-23
+
+Patch release with the first batch of feedback fixes after `0.1.0-beta`.
+
+### Added
+- **Real battery info on the Overview dashboard.** `BatteryCard` was a
+  placeholder; it now shows the live battery percentage, the configured
+  FlexiCharger range, an AC-status line ("Charging" / "At charge limit"
+  / "Plugged in" / "On battery"), and a tick mark on the progress bar
+  at the upper charge limit.
+- **Battery percent + AC status piped through the telemetry sample**, so
+  the dashboard updates once a second alongside temperatures and RPMs.
+  AC status is read from Windows' `GetSystemPowerStatus` directly in
+  the GUI process — no daemon work needed.
+- **Battery page now reflects the actual limit on disk.** If the daemon
+  is configured for 70–80%, the page opens with "Balanced" already
+  selected instead of always starting on Balanced regardless. The page
+  also shows the live battery percentage in its header.
+
+### Changed
+- **Titlebar window controls follow Windows conventions** — three
+  square buttons on the right (minimize, maximize/restore, close), with
+  close lighting up `#e81123` on hover. The macOS-style traffic-light
+  dots are gone.
+- **App version is now read from `tauri.conf.json` at runtime** via
+  `@tauri-apps/api/app::getVersion`. The hardcoded `0.1.0` strings in
+  Titlebar and Settings are gone — one place to bump for every release.
+  GUI Cargo crate has its own version (separate from the workspace one)
+  to stay in sync with the Tauri config.
+
+### Fixed
+- **"Check for updates" returned HTTP 404** when every release was a
+  prerelease, because GitHub's `/releases/latest` endpoint hides
+  prereleases. Switched to listing `/releases` and taking the most
+  recent entry regardless of the prerelease flag.
+
 ## [0.1.0-beta] - 2026-05-22
 
 First public build of the A-mi13 fork. Ships the GUI, the MSI installer

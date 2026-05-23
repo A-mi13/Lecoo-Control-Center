@@ -42,7 +42,13 @@
       "title": "风扇"
     },
     "battery": {
-      "title": "电池"
+      "title": "电池",
+      "charging": "充电中",
+      "at_limit": "已达充电限制",
+      "plugged": "已接电源",
+      "on_battery": "电池供电",
+      "unknown": "电源状态未知",
+      "limit_mark": "限制"
     }
   },
   "led": {
