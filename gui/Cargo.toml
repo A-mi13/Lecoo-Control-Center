@@ -3,7 +3,7 @@ name = "gui"
 # The GUI is a separate product from the upstream daemon/CLI, so we version
 # it independently. Keep this in sync with gui/tauri.conf.json — that's the
 # user-facing string baked into the MSI and read at runtime via getVersion().
-version = "0.1.3"
+version = "0.1.4"
 authors.workspace = true
 description.workspace = true
 repository.workspace = true

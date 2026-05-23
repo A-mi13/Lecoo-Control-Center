@@ -7,6 +7,25 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 (nothing yet — the next entry will land here.)
 
+## [0.1.4-beta] - 2026-05-23
+
+Two small fixes from user feedback right after `0.1.3-beta`.
+
+### Fixed
+- **"Open release page" in Settings now actually opens GitHub.**
+  `@tauri-apps/plugin-shell::open` was failing silently because the
+  webview capability list didn't include `shell:allow-open`. Added it
+  with a scope restricted to `github.com` and `*.github.com` so the
+  permission can't be misused. Same fix unblocks the "View on GitHub"
+  link in the About card.
+
+### Changed
+- **Fans page shows both fans side by side.** The CPU/GPU segment up
+  top was hiding half the data — temp + rpm + mode for CPU and GPU
+  now live in their own columns, and each fan has its own `Auto / Full`
+  segment. Mode-per-fan was already supported on the daemon side; the
+  UI just didn't surface it.
+
 ## [0.1.3-beta] - 2026-05-23
 
 Polish + acceptance pass. No headline features, just smaller fixes that

@@ -92,6 +92,8 @@
     "subtitle": "由 EC 管理的散热",
     "live_temp": "实时温度",
     "live_rpm": "实时转速",
+    "cpu_temp": "CPU 温度",
+    "sys_temp": "系统温度",
     "mode_title": "风扇模式",
     "mode": {
       "auto": "自动",

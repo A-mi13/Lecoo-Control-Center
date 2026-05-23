@@ -92,6 +92,8 @@
     "subtitle": "EC-managed cooling",
     "live_temp": "Live temperature",
     "live_rpm": "Live RPM",
+    "cpu_temp": "CPU temp",
+    "sys_temp": "System temp",
     "mode_title": "Fan mode",
     "mode": {
       "auto": "Auto",
