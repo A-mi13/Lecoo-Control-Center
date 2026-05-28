@@ -5,7 +5,8 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 ## [Unreleased]
 
-(nothing yet — the next entry will land here.)
+### Changed
+- **Installer**: Windows install directory unified to `C:\Program Files\LecooControlCenter\` (no spaces) across both the MSI installer and `scripts/windows/install.bat`. Previously the MSI installed under `Lecoo Control Center` (with spaces) while the .bat installer used `LecooControlCenter` (no spaces) — this is now consistent. Upgrade from earlier MSI versions is handled automatically via MajorUpgrade; the old empty folder may be deleted manually after the upgrade.
 
 ## [0.1.4-beta] - 2026-05-23
 

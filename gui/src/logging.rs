@@ -87,6 +87,9 @@ fn build_filter(level: &str) -> Result<EnvFilter, tracing_subscriber::filter::Pa
 }
 
 fn resolve_log_dir() -> PathBuf {
+    // Legacy: keep the "Lecoo Control Center" project name (with spaces) even though
+    // the installer now ships under "LecooControlCenter". Renaming this would migrate
+    // existing users' log history to a new %LOCALAPPDATA% folder and lose it.
     if let Some(dirs) = ProjectDirs::from("com", "amid13", "Lecoo Control Center") {
         return dirs.data_local_dir().join("logs");
     }

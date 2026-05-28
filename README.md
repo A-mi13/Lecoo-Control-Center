@@ -24,7 +24,7 @@ This repository is a fork of [LaVashikk/Lecoo-Control-Center](https://github.com
 This fork adds and changes the following:
 
 - **Tauri 2 + React desktop GUI** — a full control surface for monitoring and configuration: live temperature/RPM tiles, a uPlot temperature chart with selectable time ranges, EC fan-mode switching (Auto / Full), power-profile and FlexiCharger limits, keyboard backlight with a live key preview, an LED-ring animation builder, Windows-style titlebar with live connection status, system tray with quick profile/fan submenus, autostart, light/dark/auto themes, and English/Russian/Chinese localisation. *(this is the main reason this fork exists.)*
-- **MSI installer that registers the daemon as a Windows Service** — one `Lecoo Control Center_*.msi` installs the GUI, the daemon, and `inpoutx64.dll`, then registers `LecooControlDaemon` as a LocalSystem auto-start service. After install the GUI opens like any normal program — no UAC prompts, no manual `cargo run --release` from an Administrator shell.
+- **MSI installer that registers the daemon as a Windows Service** — one `LecooControlCenter_*.msi` installs the GUI, the daemon, and `inpoutx64.dll`, then registers `LecooControlDaemon` as a LocalSystem auto-start service. After install the GUI opens like any normal program — no UAC prompts, no manual `cargo run --release` from an Administrator shell.
 - **In-app diagnostics for bug reports** — Settings → Diagnostics → Copy diagnostics packages the GUI version, OS info, last daemon error, and a tail of the rotating log into a markdown block that can be pasted straight into a GitHub issue. Verbose logging can be toggled from the same screen.
 - **Daemon improvements (planned in this fork)** — resume-from-sleep state restore, Windows 11 25H2 service-start fix, and an EC I/O lock-contention guard. Server-side fan curve evaluation is intentionally **not** part of this fork — it belongs in the upstream daemon (see *Known limitations*). All progress is tracked in [CHANGELOG.md](CHANGELOG.md).
 
@@ -73,8 +73,8 @@ For the lower-level CLI (`lecoo-ctrl ...`) commands — temperature reads, manua
 
 The recommended way to install is via the MSI:
 
-1. Grab the latest `Lecoo Control Center_*.msi` from the [Releases page](https://github.com/A-mi13/Lecoo-Control-Center/releases) once a tagged build is published, **or** build one yourself from source (see below).
-2. Run it as Administrator. The installer copies the GUI and daemon into `C:\Program Files\Lecoo Control Center\` and registers the daemon as a Windows service called `LecooControlDaemon` (LocalSystem, auto-start).
+1. Grab the latest `LecooControlCenter_*.msi` from the [Releases page](https://github.com/A-mi13/Lecoo-Control-Center/releases) once a tagged build is published, **or** build one yourself from source (see below).
+2. Run it as Administrator. The installer copies the GUI and daemon into `C:\Program Files\LecooControlCenter\` and registers the daemon as a Windows service called `LecooControlDaemon` (LocalSystem, auto-start).
 3. After install, open **Lecoo Control Center** from the Start menu. The GUI launches as a regular user — the service is already running in the background and handling EC access.
 
 To verify the service after install:
@@ -113,7 +113,7 @@ pnpm tauri build
 `pnpm tauri build` produces a single MSI at:
 
 ```
-target/release/bundle/msi/Lecoo Control Center_<version>_x64_en-US.msi
+target/release/bundle/msi/LecooControlCenter_<version>_x64_en-US.msi
 ```
 
 That MSI bundles the daemon (it is rebuilt automatically as part of the bundle step), the `inpoutx64.dll` from `libs/`, and the GUI itself, and wires up the Windows service exactly as the published installer does.

@@ -24,7 +24,7 @@
 Что добавляет этот форк:
 
 - **Десктопный GUI на Tauri 2 + React** — полноценная панель управления: live-плитки температур и оборотов, uPlot-график с выбором временного диапазона, переключение режима EC-вентиляторов (Auto / Full), профилей питания и FlexiCharger, подсветка клавиатуры с превью клавиш, конструктор анимаций LED-кольца, Windows-style titlebar с индикатором связи, system tray с быстрыми меню профилей/вентиляторов, автозапуск, темы (light/dark/auto), локализация на трёх языках. *(основная причина существования этого форка.)*
-- **MSI-инсталлер, регистрирующий daemon как Windows-сервис** — один файл `Lecoo Control Center_*.msi` ставит GUI, daemon и `inpoutx64.dll`, прописывает `LecooControlDaemon` как сервис LocalSystem с автозапуском. После установки GUI открывается как обычная программа — без UAC, без запуска от Администратора руками.
+- **MSI-инсталлер, регистрирующий daemon как Windows-сервис** — один файл `LecooControlCenter_*.msi` ставит GUI, daemon и `inpoutx64.dll`, прописывает `LecooControlDaemon` как сервис LocalSystem с автозапуском. После установки GUI открывается как обычная программа — без UAC, без запуска от Администратора руками.
 - **Встроенная диагностика для багрепортов** — Settings → Diagnostics → Copy diagnostics собирает версию GUI, инфу о системе, последнюю ошибку daemon'а и хвост лог-файла в markdown-блок, который вставляется прямо в issue. Verbose logging переключается там же.
 - **Доработки daemon'а (в плане этого форка)** — server-side вычисление кривой, восстановление состояния после resume-from-sleep, фикс автостарта на Windows 11 25H2 и страховка от lock-contention в EC. Прогресс отражается в [CHANGELOG.md](CHANGELOG.md).
 
@@ -73,8 +73,8 @@ GUI находится в **бета**-стадии. Все семь фаз (she
 
 Рекомендованный путь — MSI:
 
-1. Возьми последний `Lecoo Control Center_*.msi` со [страницы Releases](https://github.com/A-mi13/Lecoo-Control-Center/releases) (как только выйдет первая тэгированная сборка) **или** собери из исходников (см. ниже).
-2. Запусти от Администратора. Инсталлер скопирует GUI и daemon в `C:\Program Files\Lecoo Control Center\` и зарегистрирует daemon как Windows-сервис `LecooControlDaemon` (LocalSystem, автозапуск).
+1. Возьми последний `LecooControlCenter_*.msi` со [страницы Releases](https://github.com/A-mi13/Lecoo-Control-Center/releases) (как только выйдет первая тэгированная сборка) **или** собери из исходников (см. ниже).
+2. Запусти от Администратора. Инсталлер скопирует GUI и daemon в `C:\Program Files\LecooControlCenter\` и зарегистрирует daemon как Windows-сервис `LecooControlDaemon` (LocalSystem, автозапуск).
 3. После установки открывай **Lecoo Control Center** из Пуска — обычным юзером, без UAC. Сервис уже работает в фоне и держит EC.
 
 Проверить сервис:
@@ -111,7 +111,7 @@ pnpm tauri build
 `pnpm tauri build` собирает один MSI:
 
 ```
-target/release/bundle/msi/Lecoo Control Center_<version>_x64_en-US.msi
+target/release/bundle/msi/LecooControlCenter_<version>_x64_en-US.msi
 ```
 
 В MSI попадают daemon (пересобирается автоматически перед bundle'ом), `inpoutx64.dll` из `libs/` и сам GUI; Windows-сервис прописывается так же как из публичного инсталлера.

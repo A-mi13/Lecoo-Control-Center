@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Lecoo Control Center",
+  "productName": "LecooControlCenter",
   "version": "0.1.4",
   "identifier": "com.amid13.lecoocontrol",
   "build": {
@@ -39,6 +39,7 @@
     "windows": {
       "wix": {
         "language": ["en-US"],
+        "upgradeCode": "b6bde5d3-aa98-561b-b84d-8e9db361c9ab",
         "fragmentPaths": ["wix/daemon-service.wxs"],
         "componentRefs": ["DaemonServiceComponent"]
       }

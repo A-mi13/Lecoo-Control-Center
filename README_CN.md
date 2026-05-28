@@ -24,7 +24,7 @@
 本分叉的新增/改动:
 
 - **Tauri 2 + React 桌面 GUI** —— 完整的控制界面:实时温度/转速磁贴、带时间窗的 uPlot 温度图、EC 风扇模式切换(自动 / 全速)、电源配置与 FlexiCharger 切换、键盘背光实时预览、LED 环呼吸动画构建器、Windows 风格标题栏(带连接状态)、托盘菜单(快速切换配置/风扇)、自启动、深浅自动主题,以及英语 / 俄语 / 中文本地化。*(此分叉存在的主要原因。)*
-- **将守护进程注册为 Windows 服务的 MSI 安装包** —— 单个 `Lecoo Control Center_*.msi` 会安装 GUI、守护进程和 `inpoutx64.dll`,并将 `LecooControlDaemon` 注册为 LocalSystem 自启动服务。安装后 GUI 像普通程序一样打开 —— 无 UAC 提示,无需手动以管理员身份运行。
+- **将守护进程注册为 Windows 服务的 MSI 安装包** —— 单个 `LecooControlCenter_*.msi` 会安装 GUI、守护进程和 `inpoutx64.dll`,并将 `LecooControlDaemon` 注册为 LocalSystem 自启动服务。安装后 GUI 像普通程序一样打开 —— 无 UAC 提示,无需手动以管理员身份运行。
 - **应用内诊断,便于报告 Bug** —— Settings → Diagnostics → Copy diagnostics 会把 GUI 版本、操作系统信息、最近的守护进程错误和当前日志尾部打包为 markdown,直接粘贴到 GitHub issue 即可。Verbose logging 也在同一界面开关。
 - **守护进程改进(此分叉规划中)** —— 休眠唤醒后的状态恢复、Windows 11 25H2 自启动修复、EC I/O 锁竞争保护。**服务端风扇曲线**有意不放在本分叉,它属于上游守护进程(见*已知限制*)。进度记录在 [CHANGELOG.md](CHANGELOG.md)。
 
@@ -73,8 +73,8 @@ GUI 处于 **Beta** 阶段。全部七个功能阶段(shell、遥测、仪表盘
 
 推荐路径是 MSI:
 
-1. 从 [Releases 页面](https://github.com/A-mi13/Lecoo-Control-Center/releases) 拿到最新的 `Lecoo Control Center_*.msi`(首个标签发布后),**或** 按下文从源码自行构建。
-2. 以管理员身份运行。安装包会把 GUI 与守护进程复制到 `C:\Program Files\Lecoo Control Center\`,并将守护进程注册为名为 `LecooControlDaemon` 的 Windows 服务(LocalSystem,自启动)。
+1. 从 [Releases 页面](https://github.com/A-mi13/Lecoo-Control-Center/releases) 拿到最新的 `LecooControlCenter_*.msi`(首个标签发布后),**或** 按下文从源码自行构建。
+2. 以管理员身份运行。安装包会把 GUI 与守护进程复制到 `C:\Program Files\LecooControlCenter\`,并将守护进程注册为名为 `LecooControlDaemon` 的 Windows 服务(LocalSystem,自启动)。
 3. 安装完成后,从开始菜单打开 **Lecoo Control Center**,以普通用户身份启动 —— 服务已经在后台运行并接管 EC 访问。
 
 验证服务:
@@ -111,7 +111,7 @@ pnpm tauri build
 `pnpm tauri build` 输出一个 MSI:
 
 ```
-target/release/bundle/msi/Lecoo Control Center_<version>_x64_en-US.msi
+target/release/bundle/msi/LecooControlCenter_<version>_x64_en-US.msi
 ```
 
 该 MSI 包含守护进程(bundle 步骤前自动重建)、来自 `libs/` 的 `inpoutx64.dll` 与 GUI 本身,并按官方安装包同样的方式注册 Windows 服务。
