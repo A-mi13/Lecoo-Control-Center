@@ -12,12 +12,6 @@
     "core:window:allow-toggle-maximize",
     "core:window:allow-close",
     "core:window:allow-is-maximized",
-    {
-      "identifier": "shell:allow-open",
-      "allow": [
-        { "url": "https://github.com/**" },
-        { "url": "https://*.github.com/**" }
-      ]
-    }
+    "shell:allow-open"
   ]
 }

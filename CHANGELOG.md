@@ -5,8 +5,34 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 ## [Unreleased]
 
+(nothing yet — the next entry will land here.)
+
+## [0.1.5-beta] - 2026-05-28
+
+### Fixed
+- **"Open release page" button in Settings now actually opens GitHub.**
+  The 0.1.4-beta attempt at fixing this added a `shell:allow-open`
+  capability with a custom `{ "url": "https://github.com/**" }`
+  allow-list, but `tauri-plugin-shell` does not read scope from the
+  capability allow-list — it reads a single regex from
+  `tauri.conf.json > plugins.shell.open` instead, so our allow-list
+  was silently ignored and the click failed ACL validation. Dropping
+  the custom allow-list and letting the plugin's default regex
+  (`http(s)`/`mailto`/`tel`) gate the URL is enough for our two
+  call sites (`releaseUrl` and `REPO_URL`), and matches the way the
+  shell plugin actually wants to be configured.
+
 ### Changed
-- **Installer**: Windows install directory unified to `C:\Program Files\LecooControlCenter\` (no spaces) across both the MSI installer and `scripts/windows/install.bat`. Previously the MSI installed under `Lecoo Control Center` (with spaces) while the .bat installer used `LecooControlCenter` (no spaces) — this is now consistent. Upgrade from earlier MSI versions is handled automatically via MajorUpgrade; the old empty folder may be deleted manually after the upgrade.
+- **Installer**: Windows install directory unified to
+  `C:\Program Files\LecooControlCenter\` (no spaces) across both the
+  MSI installer and `scripts/windows/install.bat`. Previously the MSI
+  installed under `Lecoo Control Center` (with spaces) while the .bat
+  installer used `LecooControlCenter` (no spaces) — this is now
+  consistent. Upgrade from earlier MSI versions is handled
+  automatically via `MajorUpgrade` (the explicit `upgradeCode` is
+  now pinned in `tauri.conf.json` so renaming the product no longer
+  shifts it); the old empty `Lecoo Control Center` folder may be
+  deleted manually after the upgrade.
 
 ## [0.1.4-beta] - 2026-05-23
 
